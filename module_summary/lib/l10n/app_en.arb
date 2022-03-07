@@ -1,0 +1,15 @@
+{
+    "summary": "Summary",
+    "books": "Books",
+    "chapters": "Chapters",
+    "verses": "Verses",
+    "versions": "Versions",
+    "pt_nvi_desc": "Portuguese New International Version",
+    "pt_acf_desc": "Portuguese Corrected and Revised Faithful Almeida",
+    "pt_aa_desc": "Portuguese Revised Almeida Biblical Press",
+    "en_bbe_desc": "English Basic",
+    "en_kj_desc": "King James Version",
+    "adjustFont": "Adjust Font to Text",
+    "adjustTextDialog": "Adjust size of text",
+    "changeTheme": "Change Theme"
+}
