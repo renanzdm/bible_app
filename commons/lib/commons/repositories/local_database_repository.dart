@@ -1,7 +1,7 @@
 import '../models/bible_model.dart';
 
 abstract class LocalDatabaseRepository {
-  Future<void> createDatabase({required String sql});
+  Future<void> createTable({required String sql});
 
   Future<List<Map<String, Object?>>> getValues({ required String table,
     List<String>? columnsReturn,
@@ -23,7 +23,7 @@ abstract class LocalDatabaseRepository {
       List<String>? whereArgs,
       required Map<String, Object?> values});
 
-  Future<void> delete({required String table,
+  Future<int> delete({required String table,
       String? whereSentence,
       List<String>? whereArgs});
 }

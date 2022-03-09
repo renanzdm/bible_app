@@ -16,7 +16,7 @@ abstract class LocalDatabaseService{
         required Map<String, Object?> values});
   Future<void> insertValuesCustomQuery(
       {required String sql,List<String>? args});
-Future<void> delete({required String table,
+Future<int> delete({required String table,
       String? whereSentence,
       List<String>? whereArgs});
 

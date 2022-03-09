@@ -12,7 +12,7 @@ class LocalDatabaseRepositoryImpl implements LocalDatabaseRepository {
       : _database = database;
 
   @override
-  Future<void> createDatabase({required String sql, List? arguments}) async {
+  Future<void> createTable({required String sql, List? arguments}) async {
     var _db = await _database.getDb();
     await _db.execute(sql, arguments);
   }
@@ -65,11 +65,12 @@ class LocalDatabaseRepositoryImpl implements LocalDatabaseRepository {
   }
 
   @override
-  Future<void> delete(
+  Future<int> delete(
       {required String table,
       String? whereSentence,
       List<String>? whereArgs}) async {
     var _db = await _database.getDb();
-    await _db.delete(table, where: whereSentence, whereArgs: whereArgs);
+   int rowsAffected = await _db.delete(table, where: whereSentence, whereArgs: whereArgs);
+   return rowsAffected;
   }
 }

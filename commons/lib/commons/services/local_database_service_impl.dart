@@ -12,7 +12,7 @@ class LocalDatabaseServiceImpl implements LocalDatabaseService {
 
   @override
   Future<void> createTable({required String sql}) async =>
-      await _localDatabaseRepository.createDatabase(sql: sql);
+      await _localDatabaseRepository.createTable(sql: sql);
 
   @override
   Future<BibleModel> configureDataBibleAllVersion(
@@ -56,7 +56,7 @@ class LocalDatabaseServiceImpl implements LocalDatabaseService {
           sql: sql, args: args);
 
   @override
-  Future<void> delete(
+  Future<int> delete(
           {required String table,
           String? whereSentence,
           List<String>? whereArgs}) async =>
