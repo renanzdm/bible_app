@@ -1,4 +1,6 @@
 
+import 'package:commons_dependencies/main.dart';
+import 'package:flutter/material.dart';
 import 'package:mobx/mobx.dart';
 import '../models/bible_model.dart';
 import '../models/config_model.dart';
@@ -10,12 +12,9 @@ import '../utils/tables_info.dart';
 
 
 
-part 'app_store.g.dart';
+class AppStore extends ChangeNotifier implements ReassembleHandler{
 
-class AppStore = _AppStore with _$AppStore;
-
-abstract class _AppStore with Store {
-  _AppStore({
+  AppStore({
     required LocalDatabaseService localService,
   }) : _localService = localService;
   final LocalDatabaseService _localService;
@@ -92,6 +91,11 @@ abstract class _AppStore with Store {
   Future<BibleModel> getBibleOfLocalJson() async {
     return await _localService.configureDataBibleAllVersion(
         versionBible: config.versionBible);
+  }
+
+  @override
+  void reassemble() {
+    
   }
 }
 

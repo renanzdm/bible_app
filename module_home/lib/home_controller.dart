@@ -1,25 +1,22 @@
 
-import 'package:commons/commons/controller/app_store.dart';
+import 'package:commons/commons/controller/app_controller.dart';
 import 'package:commons/commons/models/book_model.dart';
 import 'package:commons/commons/models/chapter_model.dart';
 import 'package:commons/commons/models/verse_model.dart';
 import 'package:commons/commons/models/verses_marked_model.dart';
 import 'package:commons/commons/services/local_database_service.dart';
 import 'package:commons/main.dart';
+import 'package:commons_dependencies/main.dart';
 import 'package:flutter/material.dart';
 import 'package:mobx/mobx.dart';
 
 
 
-part 'home_store.g.dart';
-
-class HomeStore = _HomeStore with _$HomeStore;
-
-abstract class _HomeStore with Store {
-  _HomeStore({required LocalDatabaseService localDatabaseService,required AppStore appStore})
+class HomeStore extends ChangeNotifier implements ReassembleHandler{
+  HomeStore({required LocalDatabaseService localDatabaseService,required AppController appStore})
       : _localService = localDatabaseService,_appStore = appStore;
 
-  final AppStore _appStore;
+  final AppController _appStore;
   final LocalDatabaseService _localService;
   BookModel bookSelected = BookModel();
   ChapterModel chapterSelected = ChapterModel();
@@ -102,10 +99,10 @@ abstract class _HomeStore with Store {
     VersesMarkedModel hasThisElementOnList = _appStore.listMarkedModel
         .singleWhere(
             (element) =>
-                element.bookId == versesMarkedModel.bookId &&
-                element.chapterId == versesMarkedModel.chapterId &&
-                element.verseId == versesMarkedModel.verseId,
-            orElse: () => const VersesMarkedModel(id: -1));
+        element.bookId == versesMarkedModel.bookId &&
+            element.chapterId == versesMarkedModel.chapterId &&
+            element.verseId == versesMarkedModel.verseId,
+        orElse: () => const VersesMarkedModel(id: -1));
     return hasThisElementOnList.id;
   }
 
@@ -133,10 +130,15 @@ abstract class _HomeStore with Store {
   @action
   Future<void> getVersesMarkedOnTable() async {
     List response =
-        await _localService.getValues(table: VersesMarkedTable.tableName);
+    await _localService.getValues(table: VersesMarkedTable.tableName);
     _appStore.listMarkedModel = response
         .map((e) => VersesMarkedModel.fromMap(e))
         .toList()
         .asObservable();
+  }
+
+  @override
+  void reassemble() {
+    debugPrint('did hot-reloas HomeController');
   }
 }

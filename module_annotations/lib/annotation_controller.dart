@@ -3,30 +3,32 @@ import 'package:commons/commons/models/annotation_verses_marked_model.dart';
 import 'package:commons/commons/services/local_database_service.dart';
 
 import 'package:commons/main.dart';
+import 'package:flutter/cupertino.dart';
 
 import 'package:mobx/mobx.dart';
 import 'package:module_annotations/services/sound_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 
-part 'annotation_store.g.dart';
-
-class AnnotationStore = _AnnotationStore with _$AnnotationStore;
-
-abstract class _AnnotationStore with Store {
-  _AnnotationStore(
+class AnnotationController extends ChangeNotifier{
+  AnnotationController(
       {required LocalDatabaseService localDatabaseService,
-      required SoundService soundService})
+        required SoundService soundService})
       : _localService = localDatabaseService,
-        _soundService = soundService;
+        _soundService = soundService{
+    sessionAudio();
+    getPermissions();
+    openAudioSession();
+    openAudioSessionPlayer();
+  }
 
   final LocalDatabaseService _localService;
   final SoundService _soundService;
 
   Future<void> insertAnnotation(
       {AnnotationVersesMarkedModel? annotationModel,
-      required int verseId,String? audioPath,
-      String? text}) async {
+        required int verseId,String? audioPath,
+        String? text}) async {
     annotationModel ??= const AnnotationVersesMarkedModel();
     annotationModel = annotationModel.copyWith(
       annotationAudio: audioPath,
@@ -66,8 +68,8 @@ abstract class _AnnotationStore with Store {
   }
 
   Future<String?> stopRecorder() async {
-   String? pathAudioSaved =  await _soundService.stopRecord();
-   return pathAudioSaved;
+    String? pathAudioSaved =  await _soundService.stopRecord();
+    return pathAudioSaved;
   }
 
   Future<void> sessionAudio() async {
@@ -78,8 +80,5 @@ abstract class _AnnotationStore with Store {
   Future<void> playSound()async{
     await  _soundService.playSound('');
   }
-
-
-
 
 }

@@ -1,15 +1,13 @@
 
 import 'package:commons/commons/models/bible_model.dart';
 import 'package:commons/commons/models/book_model.dart';
-import 'package:commons/commons/models/verse_model.dart';
 import 'package:commons/commons/models/chapter_model.dart';
-import 'package:mobx/mobx.dart';
+import 'package:commons/commons/models/verse_model.dart';
+import 'package:commons_dependencies/main.dart';
+import 'package:flutter/material.dart';
 
-part 'summary_store.g.dart';
+class SummaryStore extends ChangeNotifier implements ReassembleHandler {
 
-class SummaryStore = _SummaryStoreBase with _$SummaryStore;
-
-abstract class _SummaryStoreBase with Store {
   BookModel bookSelected = BookModel();
   ChapterModel chapterSelected = ChapterModel();
   VerseModel verseSelected = VerseModel();
@@ -46,5 +44,10 @@ abstract class _SummaryStoreBase with Store {
     verseSelected = VerseModel(
         verse: bibleModel.books.first.chapters.first.verses.first.verse,id: 1);
     versionBibleSelected = bibleModel.version;
+  }
+
+  @override
+  void reassemble() {
+    debugPrint('did hot-reload SummaryController');
   }
 }
