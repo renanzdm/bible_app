@@ -8,12 +8,12 @@ import 'package:commons/commons/services/local_database_service.dart';
 import 'package:commons/main.dart';
 import 'package:commons_dependencies/main.dart';
 import 'package:flutter/material.dart';
-import 'package:mobx/mobx.dart';
 
 
 
-class HomeStore extends ChangeNotifier implements ReassembleHandler{
-  HomeStore({required LocalDatabaseService localDatabaseService,required AppController appStore})
+
+class HomeController extends ChangeNotifier implements ReassembleHandler{
+  HomeController({required LocalDatabaseService localDatabaseService,required AppController appStore})
       : _localService = localDatabaseService,_appStore = appStore;
 
   final AppController _appStore;
@@ -21,20 +21,21 @@ class HomeStore extends ChangeNotifier implements ReassembleHandler{
   BookModel bookSelected = BookModel();
   ChapterModel chapterSelected = ChapterModel();
   VerseModel verseSelected = VerseModel();
-  @observable
-  ObservableList<VerseModel> versesList = ObservableList();
+  List<VerseModel> versesList = [];
+
+
   int? idVerseClicked;
 
-  @observable
+
   Color pickerColor = const Color.fromARGB(255, 124, 20, 180);
   Color currentColor = const Color.fromARGB(255, 154, 14, 224);
 
-  @action
+
   void changeColor(Color color) {
-    pickerColor = color;
+   pickerColor = color;
   }
 
-  @action
+
   void setDefaultValuesBible({
     required VerseModel verseModel,
     required ChapterModel chapterModel,
@@ -43,7 +44,7 @@ class HomeStore extends ChangeNotifier implements ReassembleHandler{
     bookSelected = bookModel;
     chapterSelected = chapterModel;
     verseSelected = verseModel;
-    versesList = chapterSelected.verses.asObservable();
+    versesList = chapterSelected.verses;
   }
 
   void configureVersesMarked(List<VersesMarkedModel> versesMarked) {
@@ -60,24 +61,26 @@ class HomeStore extends ChangeNotifier implements ReassembleHandler{
     }
   }
 
-  @action
-  setVerseModelSelected({required int index}) {
+
+  void setVerseModelSelected({required int index}) {
     verseSelected = versesList[index];
     bool oldValueIsMarked = !versesList[index].isMarked;
     versesList[index] = versesList[index]
         .copyWith(isMarked: oldValueIsMarked, colorMarked: pickerColor);
+    notifyListeners();
   }
 
-  @action
+
   Future<void> changeTheme() async {
     _appStore.config =
         _appStore.config.copyWith(isDark: !_appStore.config.isDark);
     await _appStore.updateConfigTable();
+    notifyListeners();
+
   }
 
 
 
-  @action
   Future<void> addVerseMarkedOnTable(
       VersesMarkedModel versesMarkedModel) async {
     int id = await alreadyVerseThisBase(versesMarkedModel);
@@ -85,6 +88,7 @@ class HomeStore extends ChangeNotifier implements ReassembleHandler{
       idVerseClicked = await _localService.insertValues(
           table: VersesMarkedTable.tableName,
           values: versesMarkedModel.toMap());
+
     } else {
       idVerseClicked = null;
       await _localService.delete(
@@ -106,7 +110,6 @@ class HomeStore extends ChangeNotifier implements ReassembleHandler{
     return hasThisElementOnList.id;
   }
 
-  @action
   Future<void> increaseFontSize() async {
     double sizeFont = _appStore.config.fontSizeVerse.toDouble();
     if (_appStore.config.fontSizeVerse < 24) {
@@ -116,7 +119,6 @@ class HomeStore extends ChangeNotifier implements ReassembleHandler{
     await _appStore.updateConfigTable();
   }
 
-  @action
   Future<void> decreaseFontSize() async {
     double sizeFont = _appStore.config.fontSizeVerse.toDouble();
     if (_appStore.config.fontSizeVerse >= 12) {
@@ -127,18 +129,17 @@ class HomeStore extends ChangeNotifier implements ReassembleHandler{
 
   }
 
-  @action
   Future<void> getVersesMarkedOnTable() async {
     List response =
     await _localService.getValues(table: VersesMarkedTable.tableName);
     _appStore.listMarkedModel = response
         .map((e) => VersesMarkedModel.fromMap(e))
-        .toList()
-        .asObservable();
+        .toList();
+    notifyListeners();
   }
 
   @override
   void reassemble() {
-    debugPrint('did hot-reloas HomeController');
+    debugPrint('did hot-reload HomeController');
   }
 }

@@ -1,18 +1,19 @@
-import 'package:commons/commons/controller/app_store.dart';
+import 'package:commons/commons/controller/app_controller.dart';
 import 'package:commons/commons/models/version_model.dart';
 import 'package:commons/main.dart';
 import 'package:flutter/material.dart';
-
+import 'package:commons_dependencies/main.dart';
 
 class ConfigVersionsBible extends StatelessWidget {
    ConfigVersionsBible({Key? key}) : super(key: key);
 
-   final AppStore _appStore = injector.get();
+   late AppController _appStore;
 
 
 
   @override
   Widget build(BuildContext context) {
+    _appStore = context.read<AppController>();
     insertVersionsBible(_appStore, context);
     return Scaffold(
       appBar: AppBar(
@@ -42,7 +43,7 @@ class ConfigVersionsBible extends StatelessWidget {
     );
   }
 
-  void insertVersionsBible(AppStore appStore, BuildContext context) {
+  void insertVersionsBible(AppController appStore, BuildContext context) {
     _appStore.versionsBible = [
       VersionsModel(
           name: VersionsType.ptNvi,

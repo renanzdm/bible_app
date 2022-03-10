@@ -1,8 +1,8 @@
 import 'package:commons_dependencies/main.dart';
 import 'package:flutter/material.dart';
 
-class SplashStore extends ChangeNotifier implements ReassembleHandler {
-  SplashStore() {
+class SplashController extends ChangeNotifier implements ReassembleHandler {
+  SplashController() {
     changeOpacity();
   }
 

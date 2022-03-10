@@ -8,8 +8,6 @@ Future<void> main() async {
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(statusBarBrightness: Brightness.dark));
-  //set globals instances,that are used in all app
-  AppModule().setInjectors();
   runApp(const App());
 }
 

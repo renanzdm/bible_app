@@ -1,7 +1,5 @@
-
 import 'package:commons_dependencies/main.dart';
 import 'package:flutter/material.dart';
-import 'package:mobx/mobx.dart';
 import '../models/bible_model.dart';
 import '../models/config_model.dart';
 import '../models/verses_marked_model.dart';
@@ -9,33 +7,25 @@ import '../models/version_model.dart';
 import '../services/local_database_service.dart';
 import '../utils/tables_info.dart';
 
-
-
-
-class AppStore extends ChangeNotifier implements ReassembleHandler{
-
-  AppStore({
+class AppController extends ChangeNotifier implements ReassembleHandler {
+  AppController({
     required LocalDatabaseService localService,
   }) : _localService = localService;
   final LocalDatabaseService _localService;
 
-  @observable
   ConfigModel config = const ConfigModel();
-  @observable
   BibleModel bibleModel = BibleModel();
   List<VersionsModel> versionsBible = <VersionsModel>[];
   List<VersesMarkedModel> listMarkedModel = <VersesMarkedModel>[];
 
-  @action
   Future<void> updateConfigTable() async {
     await _localService.updateValue(
         table: ConfigTable.tableName, values: config.toMap());
+    notifyListeners();
   }
 
-
   Future<void> changeVersionBible(VersionsModel versionsModel) async {
-    config =
-        config.copyWith(versionBible: versionsModel.value);
+    config = config.copyWith(versionBible: versionsModel.value);
     await updateConfigTable();
   }
 
@@ -95,7 +85,7 @@ class AppStore extends ChangeNotifier implements ReassembleHandler{
 
   @override
   void reassemble() {
-    
+    debugPrint('Did hot-reload');
   }
 }
 

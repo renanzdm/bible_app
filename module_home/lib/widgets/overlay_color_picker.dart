@@ -1,15 +1,16 @@
 import 'package:commons/main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:commons_dependencies/main.dart';
 
 
-import '../home_store.dart';
+import '../home_controller.dart';
 import 'content_bottom_sheet.dart';
 
 class OverlayColorPicker extends StatelessWidget {
   final VoidCallback onTap;
-  final HomeStore _homeStore = injector.get<HomeStore>();
-  OverlayColorPicker({Key? key, required this.onTap}) : super(key: key);
+
+  const OverlayColorPicker({Key? key, required this.onTap}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +26,7 @@ class OverlayColorPicker extends StatelessWidget {
           ),
           color: Colors.black54,
           child: Column(
-            
+
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10.0),
@@ -35,8 +36,8 @@ class OverlayColorPicker extends StatelessWidget {
                     GestureDetector(
                       onTap: () {
                         onTap();
-                        if(_homeStore.idVerseClicked!=null) {
-                          Navigator.pushNamed(context, NamedRoutes.annotationPage,arguments: _homeStore.idVerseClicked);
+                        if(context.read<HomeController>().idVerseClicked!=null) {
+                          Navigator.pushNamed(context, NamedRoutes.annotationPage,arguments: context.read<HomeController>().idVerseClicked);
                         }
                       },
                       child: Icon(
@@ -60,9 +61,9 @@ class OverlayColorPicker extends StatelessWidget {
                 ),
               ),
               ContentBottomSheet(
-                color: _homeStore.currentColor,
+                color: context.read<HomeController>().currentColor,
                 onTap: (color) {
-                  _homeStore.changeColor(color);
+                  context.read<HomeController>().changeColor(color);
                   onTap();
                 },
               ),

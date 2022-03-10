@@ -1,4 +1,4 @@
-import 'package:commons/commons/controller/app_store.dart';
+import 'package:commons/commons/controller/app_controller.dart';
 import 'package:commons/commons/services/local_database_service.dart';
 import 'package:commons_dependencies/main.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -9,7 +9,7 @@ class LocalDatabaseServiceImplMock extends Mock
 Future main() async {
   LocalDatabaseServiceImplMock localDatabaseRepositoryImplMock =
       LocalDatabaseServiceImplMock();
-  final appStore = AppStore(localService: localDatabaseRepositoryImplMock);
+  final appStore = AppController(localService: localDatabaseRepositoryImplMock);
 
   setUpAll(() {
     sqfliteFfiInit();

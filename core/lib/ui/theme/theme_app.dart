@@ -1,11 +1,13 @@
 
-import 'package:commons/commons/controller/app_store.dart';
+import 'package:commons/commons/controller/app_controller.dart';
 import 'package:commons/main.dart';
 import 'package:flutter/material.dart';
+import 'package:commons_dependencies/main.dart';
+
 
 class ThemeApp {
   static ThemeData theme(BuildContext context) {
-AppStore _appStore = injector.get<AppStore>();
+    AppController _appStore = context.watch<AppController>();
     return ThemeData(
       colorScheme: () {
         if (_appStore.config.isDark) {

@@ -3,8 +3,8 @@
 import 'package:commons/main.dart';
 import 'package:flutter/material.dart';
 import 'package:module_home/widgets/button_adjust_font.dart';
-
-import '../home_store.dart';
+import 'package:commons_dependencies/main.dart';
+import '../home_controller.dart';
 
 class ContentDialogAdjustFont extends StatefulWidget {
   const ContentDialogAdjustFont({Key? key}) : super(key: key);
@@ -15,7 +15,7 @@ class ContentDialogAdjustFont extends StatefulWidget {
 }
 
 class _ContentDialogAdjustFontState extends State<ContentDialogAdjustFont> {
-  final HomeStore _homeStore=injector.get<HomeStore>();
+
 
   @override
   Widget build(BuildContext context) {
@@ -54,13 +54,13 @@ class _ContentDialogAdjustFontState extends State<ContentDialogAdjustFont> {
                   ButtonAdjustFont(
                     icon: Icons.add,
                     onTap: () {
-                      _homeStore.increaseFontSize();
+                      context.read<HomeController>().increaseFontSize();
                     },
                   ),
                   ButtonAdjustFont(
                     icon: Icons.remove,
                     onTap: () {
-                      _homeStore.decreaseFontSize();
+                      context.read<HomeController>().decreaseFontSize();
                     },
                   ),
                 ],

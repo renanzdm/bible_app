@@ -1,8 +1,8 @@
 
 import 'package:commons/main.dart';
 import 'package:flutter/material.dart';
-
-import '../summary_store.dart';
+import 'package:commons_dependencies/main.dart';
+import '../summary_controller.dart';
 import 'verses_page.dart';
 
 const int tabNumberChapters = 1;
@@ -18,8 +18,15 @@ class ChaptersPage extends StatefulWidget {
 
 class _ChaptersPageState extends State<ChaptersPage>
     with AutomaticKeepAliveClientMixin {
-   final SummaryStore _summaryController=injector.get<SummaryStore>();
+  late SummaryController _summaryController;
 
+
+  @override
+  void initState() {
+    super.initState();
+    _summaryController = context.read<SummaryController>();
+
+  }
 
 
   @override

@@ -1,13 +1,14 @@
-import 'package:commons/commons/controller/app_store.dart';
+import 'package:commons/commons/controller/app_controller.dart';
+import 'package:commons/commons/local_database/local_database_instance.dart';
 import 'package:commons/commons/models/verses_marked_model.dart';
+import 'package:commons/commons/repositories/local_database_repository_impl.dart';
+import 'package:commons/commons/services/local_database_service_impl.dart';
 import 'package:commons/main.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:module_home/home_screen_arguments.dart';
 import 'package:module_home/widgets/verse_widget.dart';
-import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-
-import 'home_store.dart';
+import 'package:commons_dependencies/main.dart';
+import 'home_controller.dart';
 import 'widgets/content_dialog_adjust_font.dart';
 import 'widgets/overlay_color_picker.dart';
 
@@ -20,10 +21,37 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage>
+class _HomePageState extends State<HomePage> {
+  @override
+  Widget build(BuildContext context) {
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => HomeController(
+              localDatabaseService: LocalDatabaseServiceImpl(
+                localDatabaseRepository: LocalDatabaseRepositoryImpl(
+                  database: LocalDatabaseInstance(),
+                ),
+              ),
+              appStore: context.read<AppController>()),
+        ),
+      ],
+      child: const HomePageContent(),
+    );
+  }
+}
+
+class HomePageContent extends StatefulWidget {
+  const HomePageContent({Key? key}) : super(key: key);
+
+  @override
+  State<HomePageContent> createState() => _HomePageContentState();
+}
+
+class _HomePageContentState extends State<HomePageContent>
     with AutomaticKeepAliveClientMixin {
-  final AppStore _appStore = injector.get<AppStore>();
-  final HomeStore _homeStore = injector.get<HomeStore>();
+  late AppController _appStore;
+  late HomeController _homeStore;
   late OverlayEntry _overlayEntry;
   late List<PopupMenuEntry<OptionValue>> listPopButtons;
   final ItemScrollController _scrollController = ItemScrollController();
@@ -39,6 +67,8 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     super.initState();
+    _appStore = context.read<AppController>();
+    _homeStore = context.read<HomeController>();
     createOverlaySelectVerse();
     WidgetsBinding.instance?.addPostFrameCallback((Duration timeStamp) async {
       _scrollController.jumpTo(index: _homeStore.verseSelected.id - 1);
@@ -49,10 +79,13 @@ class _HomePageState extends State<HomePage>
 
   void createOverlaySelectVerse() {
     _overlayEntry = OverlayEntry(
-      builder: (BuildContext context) => OverlayColorPicker(
-        onTap: () {
-          removeOverlayScreen();
-        },
+      builder: (BuildContext context) => ChangeNotifierProvider.value(
+        value: _homeStore,
+        child: OverlayColorPicker(
+          onTap: () {
+            removeOverlayScreen();
+          },
+        ),
       ),
     );
   }
@@ -64,30 +97,9 @@ class _HomePageState extends State<HomePage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    HomeScreenArguments args = HomeScreenArguments.fromMap(
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>);
-    _homeStore.setDefaultValuesBible(
-      verseModel: args.verseModel,
-      chapterModel: args.chapterModel,
-      bookModel: args.bookModel,
-    );
-    listPopButtons = [
-      PopupMenuItem(
-        value: OptionValue.adjustFont,
-        child: Text(
-          "Ajustar Fonte",
-          style: Theme.of(context).textTheme.headline6?.copyWith(fontSize: 16),
-        ),
-      ),
-      PopupMenuItem(
-        value: OptionValue.darkMode,
-        child: Text(
-          'Mudar fonte',
-          style: Theme.of(context).textTheme.headline6?.copyWith(fontSize: 16),
-        ),
-      ),
-    ];
-
+    HomeScreenArguments args = getRouteArguments(context);
+    setDefaultValuesBible(args);
+    generatePopUpButtons(context);
     return Scaffold(
       appBar: AppBarWidget(
         actions: [
@@ -119,9 +131,12 @@ class _HomePageState extends State<HomePage>
                   await showDialog(
                       context: context,
                       barrierDismissible: false,
-                      builder: (_) {
-                        return const Center(
-                          child: ContentDialogAdjustFont(),
+                      builder: (context) {
+                        return ChangeNotifierProvider.value(
+                          value: _homeStore,
+                          child: const Center(
+                            child: ContentDialogAdjustFont(),
+                          ),
                         );
                       });
 
@@ -138,11 +153,11 @@ class _HomePageState extends State<HomePage>
           ),
         ],
       ),
-      body: Padding(
-        padding: ScaffoldPadding.horizontal,
-        child: Observer(
-          builder: (context) {
-            return SizedBox(
+      body: Consumer<HomeController>(
+        builder: (BuildContext context, HomeController value, Widget? child) {
+          return Padding(
+            padding: ScaffoldPadding.horizontal,
+            child: SizedBox(
               child: ScrollablePositionedList.builder(
                 physics: const BouncingScrollPhysics(),
                 itemCount: _homeStore.versesList.length,
@@ -162,19 +177,52 @@ class _HomePageState extends State<HomePage>
                       );
                     },
                     child: VersesWidget(
-                        verseModel: _homeStore.versesList[index],
-                        idVerse: _homeStore.versesList[index].id,
+                        verseModel: value.versesList[index],
+                        idVerse: value.versesList[index].id,
                         indexItem: index),
                   );
                 },
                 itemScrollController: _scrollController,
                 itemPositionsListener: itemPositionsListener,
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
+  }
+
+  HomeScreenArguments getRouteArguments(BuildContext context) {
+    HomeScreenArguments args = HomeScreenArguments.fromMap(
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>);
+    return args;
+  }
+
+  void setDefaultValuesBible(HomeScreenArguments args) {
+    _homeStore.setDefaultValuesBible(
+      verseModel: args.verseModel,
+      chapterModel: args.chapterModel,
+      bookModel: args.bookModel,
+    );
+  }
+
+  void generatePopUpButtons(BuildContext context) {
+    listPopButtons = [
+      PopupMenuItem(
+        value: OptionValue.adjustFont,
+        child: Text(
+          "Ajustar Fonte",
+          style: Theme.of(context).textTheme.headline6?.copyWith(fontSize: 16),
+        ),
+      ),
+      PopupMenuItem(
+        value: OptionValue.darkMode,
+        child: Text(
+          'Mudar Tema',
+          style: Theme.of(context).textTheme.headline6?.copyWith(fontSize: 16),
+        ),
+      ),
+    ];
   }
 
   @override

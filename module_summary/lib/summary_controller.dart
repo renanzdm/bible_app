@@ -6,7 +6,7 @@ import 'package:commons/commons/models/verse_model.dart';
 import 'package:commons_dependencies/main.dart';
 import 'package:flutter/material.dart';
 
-class SummaryStore extends ChangeNotifier implements ReassembleHandler {
+class SummaryController extends ChangeNotifier implements ReassembleHandler {
 
   BookModel bookSelected = BookModel();
   ChapterModel chapterSelected = ChapterModel();

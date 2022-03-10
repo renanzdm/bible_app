@@ -5,7 +5,6 @@ abstract class Module {
   Module({
     this.routes = const {},  
   });
-  void setInjectors();
 }
 
 

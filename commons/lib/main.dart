@@ -1,4 +1,3 @@
-export 'commons/injectors.dart';
 export 'commons/module.dart';
 export './commons/utils/background_parser.dart';
 export './commons/utils/scaffold_padding.dart';
