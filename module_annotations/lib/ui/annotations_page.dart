@@ -45,7 +45,7 @@ class AnnotationPageContent extends StatefulWidget {
 }
 
 class _AnnotationPageContentState extends State<AnnotationPageContent> {
-  late int id;
+  late int verseId;
   late AnnotationController _annotationStore;
   int maxLength = 500;
   String textValue = '';
@@ -65,7 +65,7 @@ class _AnnotationPageContentState extends State<AnnotationPageContent> {
 
   @override
   Widget build(BuildContext context) {
-    id = ModalRoute.of(context)?.settings.arguments as int;
+    verseId = ModalRoute.of(context)?.settings.arguments as int;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Criar Anotacao'),
@@ -96,11 +96,11 @@ class _AnnotationPageContentState extends State<AnnotationPageContent> {
                           Text('${textValue.length}/${maxLength.toString()}'),
                     ),
                   ),
-                   RecordAudioWidget(verseId: id.toString(),),
+                   RecordAudioWidget(verseId: verseId.toString(),),
                   ElevatedButton(
                     onPressed: () async {
                       await _annotationStore.insertAnnotation(
-                          verseId: id, text: textValue, );
+                          verseId: verseId, text: textValue, );
                     },
                     child: const Text('Salvar'),
                   ),
