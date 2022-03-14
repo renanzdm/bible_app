@@ -73,4 +73,10 @@ class LocalDatabaseRepositoryImpl implements LocalDatabaseRepository {
    int rowsAffected = await _db.delete(table, where: whereSentence, whereArgs: whereArgs);
    return rowsAffected;
   }
+
+  @override
+  Future<List<Map<String, Object?>>> getValuesCustomQuery({required String sql, List<String>? args}) async {
+   var _db = await _database.getDb();
+    return   await _db.rawQuery(sql,args);
+  }
 }

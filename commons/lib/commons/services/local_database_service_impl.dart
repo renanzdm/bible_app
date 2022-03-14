@@ -1,4 +1,3 @@
-
 import '../models/bible_model.dart';
 import '../repositories/local_database_repository.dart';
 import 'local_database_service.dart';
@@ -62,4 +61,9 @@ class LocalDatabaseServiceImpl implements LocalDatabaseService {
           List<String>? whereArgs}) async =>
       await _localDatabaseRepository.delete(
           table: table, whereSentence: whereSentence, whereArgs: whereArgs);
+
+  @override
+  Future<List<Map<String, Object?>>> getValuesCustomQuery(
+          {required String sql, List<String>? args}) async =>
+      await _localDatabaseRepository.getValuesCustomQuery(sql: sql, args: args);
 }

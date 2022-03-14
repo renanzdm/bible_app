@@ -19,16 +19,14 @@ class BooksPage extends StatefulWidget {
 
 class _BooksPageState extends State<BooksPage>
     with AutomaticKeepAliveClientMixin {
-  late AppController _appStore;
   late SummaryController _summaryController;
 
 @override
   void initState() {
     super.initState();
-    _appStore = context.read<AppController>();
     _summaryController = context.read<SummaryController>();
     _summaryController.setDefaultValuesBible(
-        bibleModel: _appStore.bibleModel);
+        bibleModel: context.read<AppController>().bibleModel);
   }
 
   @override
@@ -39,22 +37,26 @@ class _BooksPageState extends State<BooksPage>
       body: Padding(
         padding: ScaffoldPadding.horizontal,
         child: SizedBox(
-          child: ListView.builder(
-            itemCount: _appStore.bibleModel.books.length,
-            itemBuilder: (BuildContext context, int index) => ListTile(
-              contentPadding: const EdgeInsets.all(4.0),
-              onTap: () {
-                _summaryController
-                    .setBookSelected(_appStore.bibleModel.books[index]);
-                if (_summaryController.bookSelected.chapters.isNotEmpty) {
-                  widget.tabController.animateTo(tabNumberChapters);
-                }
-              },
-              title: Text(
-                _appStore.bibleModel.books[index].nameBook,
-                style: Theme.of(context).textTheme.headline6,
-              ),
-            ),
+          child: Consumer<AppController>(
+            builder: (context,AppController value, child) {
+              return ListView.builder(
+                itemCount: value.bibleModel.books.length,
+                itemBuilder: (BuildContext context, int index) => ListTile(
+                  contentPadding: const EdgeInsets.all(4.0),
+                  onTap: () {
+                    _summaryController
+                        .setBookSelected(context.read<AppController>().bibleModel.books[index]);
+                    if (_summaryController.bookSelected.chapters.isNotEmpty) {
+                      widget.tabController.animateTo(tabNumberChapters);
+                    }
+                  },
+                  title: Text(
+                    value.bibleModel.books[index].nameBook,
+                    style: Theme.of(context).textTheme.headline6,
+                  ),
+                ),
+              );
+            }
           ),
         ),
       ),

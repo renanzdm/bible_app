@@ -2,11 +2,12 @@ import 'package:commons_dependencies/main.dart';
 
 import 'record_service.dart';
 
-class RecordServiceImpl implements RecordService{
+class RecordServiceImpl implements RecordService {
   const RecordServiceImpl({
     required FlutterSoundRecorder myRecorder,
   }) : _myRecorder = myRecorder;
   final FlutterSoundRecorder _myRecorder;
+
   @override
   Future<void> openAudioRecordSession() async {
     await _myRecorder.openRecorder();
@@ -25,6 +26,7 @@ class RecordServiceImpl implements RecordService{
 
   @override
   Future<void> closeAudioRecordSession() async {
+
     await _myRecorder.closeRecorder();
   }
 
@@ -38,13 +40,23 @@ class RecordServiceImpl implements RecordService{
   bool get isStopped => _myRecorder.isStopped;
 
   @override
-  Stream<RecordingDisposition>?  get onProgress => _myRecorder.onProgress;
+  Stream<RecordingDisposition>? get onProgress => _myRecorder.onProgress;
 
   @override
-  Future<void> setDurationUpdateOnProgress({Duration duration = const Duration(milliseconds: 100)}) async {
+  Future<void> setDurationUpdateOnProgress(
+      {Duration duration = const Duration(milliseconds: 100)}) async {
     await _myRecorder.setSubscriptionDuration(duration);
   }
 
+  @override
+  Future<void> pauseRecord() async {
+    await _myRecorder.pauseRecorder();
+  }
+
+  @override
+  Future<void> resumeRecord() async {
+    await _myRecorder.resumeRecorder();
+  }
+
+
 }
-
-

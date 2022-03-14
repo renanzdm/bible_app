@@ -19,7 +19,6 @@ class DecibelsWidget extends StatelessWidget {
           listDecibels.removeAt(0);
         }
         listDecibels.add(snapshot.data?.decibels ?? 0.0);
-
         return CustomPaint(
           painter: DecibelsRecordAudioPainter(listDecibels),
           size: Size(SizeOfWidget.sizeFromWidth(context), 100),
@@ -42,7 +41,7 @@ class DecibelsRecordAudioPainter extends CustomPainter {
       ..style = PaintingStyle.fill;
     double x = 0.0;
     for (double item in listDecibels) {
-      canvas.drawLine(Offset(x, size.height-20), Offset(x, -item+20), _paint);
+      canvas.drawLine(Offset(x, item), Offset(x, -item), _paint);
       x++;
     }
   }

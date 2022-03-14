@@ -16,6 +16,8 @@ abstract class LocalDatabaseRepository {
 
   Future<void> insertValuesCustomQuery(
       {required String sql,List<String>? args});
+  Future<List<Map<String, Object?>>> getValuesCustomQuery(
+      {required String sql,List<String>? args});
 
   Future<int> updateValue(
       {required String table,

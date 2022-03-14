@@ -36,27 +36,31 @@ class _ChaptersPageState extends State<ChaptersPage>
       body: Padding(
         padding: ScaffoldPadding.horizontal,
         child: SizedBox(
-          child: GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 5,
-            ),
-            itemCount: _summaryController.bookSelected.chapters.length,
-            itemBuilder: (BuildContext context, int index) => ListTile(
-              onTap: () {
-                if (_summaryController.chapterSelected.verses.isNotEmpty) {
-                  _summaryController.setChapterSelected(
-                      _summaryController.bookSelected.chapters[index]);
+          child: Consumer<SummaryController>(
+            builder: (context,value,child) {
+              return GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 5,
+                ),
+                itemCount: value.bookSelected.chapters.length,
+                itemBuilder: (BuildContext context, int index) => ListTile(
+                  onTap: () {
+                    if (_summaryController.chapterSelected.verses.isNotEmpty) {
+                      _summaryController.setChapterSelected(
+                          _summaryController.bookSelected.chapters[index]);
 
-                  widget.tabController.animateTo(tabNumberVerses);
-                }
-              },
-              contentPadding: const EdgeInsets.all(4.0),
-              title: Text(
-                _summaryController.bookSelected.chapters[index].id.toString(),
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.headline6,
-              ),
-            ),
+                      widget.tabController.animateTo(tabNumberVerses);
+                    }
+                  },
+                  contentPadding: const EdgeInsets.all(4.0),
+                  title: Text(
+                    value.bookSelected.chapters[index].id.toString(),
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.headline6,
+                  ),
+                ),
+              );
+            }
           ),
         ),
       ),

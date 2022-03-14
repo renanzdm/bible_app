@@ -19,6 +19,8 @@ abstract class LocalDatabaseService{
 Future<int> delete({required String table,
       String? whereSentence,
       List<String>? whereArgs});
+  Future<List<Map<String, Object?>>> getValuesCustomQuery(
+      {required String sql,List<String>? args});
 
 
 

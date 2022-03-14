@@ -67,6 +67,7 @@ class _SummaryPageState extends State<SummaryPage>
         ),
         body: TabBarView(
           controller: _tabController,
+          physics: const NeverScrollableScrollPhysics(),
           children: [
             BooksPage(
               tabController: _tabController,

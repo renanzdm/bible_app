@@ -1,20 +1,27 @@
 import 'package:commons_dependencies/main.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:module_annotations/services/record_service.dart';
+import 'package:module_annotations/services/record_service/record_service.dart';
 
 class RecordAudioController extends ChangeNotifier
     implements ReassembleHandler {
   RecordAudioController({
     required RecordService recordService,
-  }) : _recordService = recordService{
+  }) : _recordService = recordService {
     openAudioRecordSession();
-
   }
 
-  final RecordService _recordService;
   bool isRecorder = false;
+  bool  isStopped = false;
 
-  Future<void> getStatusRecorder()async{
+  final Stopwatch timer = Stopwatch();
+
+  final RecordService _recordService;
+
+  void getIsStopped(){
+    isStopped = _recordService.isStopped;
+  }
+
+  void getIsRecorder() {
     isRecorder = _recordService.isRecording;
     notifyListeners();
   }
@@ -30,23 +37,36 @@ class RecordAudioController extends ChangeNotifier
   Future<void> startRecorder(String id) async {
     String pathToSave = 'annotations_audio_$id.aac';
     await _recordService.startRecord(pathToSave: pathToSave);
-    getStatusRecorder();
+    getIsRecorder();
+    timer.start();
     setDurationUpdateProgress();
   }
 
   Future<String?> stopRecorder() async {
     String? pathAudioSaved = await _recordService.stopRecord();
-    getStatusRecorder();
+    getIsRecorder();
+    timer.reset();
+    timer.stop();
     return pathAudioSaved;
   }
 
   Stream<RecordingDisposition>? get onProgress => _recordService.onProgress;
 
-  Future<void> setDurationUpdateProgress()async{
+  Future<void> setDurationUpdateProgress() async {
     await _recordService.setDurationUpdateOnProgress();
   }
 
+  Future<void> pauseRecorder() async {
+    await _recordService.pauseRecord();
+  getIsRecorder();
+    timer.stop();
+  }
 
+  Future<void> resumeRecorder() async {
+    await _recordService.resumeRecord();
+    getIsRecorder();
+    timer.start();
+  }
 
   @override
   void reassemble() {

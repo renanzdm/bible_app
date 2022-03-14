@@ -1,24 +1,25 @@
+import 'dart:developer';
+
 import 'package:commons/commons/models/annotation_verses_marked_model.dart';
 import 'package:commons/commons/services/local_database_service.dart';
 import 'package:commons/main.dart';
 import 'package:commons_dependencies/main.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:module_annotations/services/sound_service.dart';
 
 class AnnotationController extends ChangeNotifier {
   AnnotationController({
-      required LocalDatabaseService localDatabaseService,
-      required SoundService soundService})
-      : _localService = localDatabaseService,
-        _soundService = soundService{
-    sessionAudio();
+    required LocalDatabaseService localDatabaseService,
+  }) : _localService = localDatabaseService {
     getPermissions();
-    openAudioSessionPlayer();
   }
 
   final LocalDatabaseService _localService;
-  final SoundService _soundService;
-  String? pathAudioCurrent;
+  String pathAudioCurrent = '';
+
+  void setAudioPath(String pathAudio) {
+    pathAudioCurrent = pathAudio;
+    notifyListeners();
+  }
 
   Future<void> insertAnnotation(
       {AnnotationVersesMarkedModel? annotationModel,
@@ -35,10 +36,16 @@ class AnnotationController extends ChangeNotifier {
         values: annotationModel.toMap());
   }
 
-
-
-  Future<void> openAudioSessionPlayer() async {
-    await _soundService.openAudioSessionPlayer();
+  Future<void> getAnnotations({required String id}) async {
+    String sql = '''
+    SELECT t1.annotation_audio, t1.annotation_text, t2.book_id,
+    t2.chapter_id,t2.verse_id
+    FROM  annotation_verses t1
+    INNER JOIN verses_marked t2
+    ON t1.fk_verse_marked_id = t2.id
+    ''';
+    var res = await _localService.getValuesCustomQuery(sql: sql);
+    log(res.toString());
   }
 
   Future<bool> getPermissions() async {
@@ -48,25 +55,4 @@ class AnnotationController extends ChangeNotifier {
     }
     return true;
   }
-
-
-
-  Future<void> closeAudioSessionPlayer() async {
-    return await _soundService.closeAudioSessionPlayer();
-  }
-
-
-
-  Future<void> sessionAudio() async {
-    final session = await AudioSession.instance;
-    await session.configure(const AudioSessionConfiguration.speech());
-  }
-
-  Future<void> playSound() async {
-    await _soundService.playSound('/data/data/com.example.base_app/cache/annotations_audio_5.aac');
-  }
-
-
-
-
 }

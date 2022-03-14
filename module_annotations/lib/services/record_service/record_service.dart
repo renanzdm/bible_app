@@ -11,5 +11,8 @@ abstract class RecordService{
   Future<String?> stopRecord();
   Future<void> openAudioRecordSession();
   Future<void> closeAudioRecordSession();
+  Future<void> pauseRecord();
+  Future<void> resumeRecord();
+
 
 }

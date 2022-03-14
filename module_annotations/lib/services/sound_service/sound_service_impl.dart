@@ -1,5 +1,5 @@
 import 'package:commons_dependencies/main.dart';
-import 'package:module_annotations/services/sound_service.dart';
+import 'package:module_annotations/services/sound_service/sound_service.dart';
 
 class SoundServiceImpl implements SoundService {
   final FlutterSoundPlayer _player;
@@ -19,5 +19,20 @@ class SoundServiceImpl implements SoundService {
   @override
   Future<void> closeAudioSessionPlayer() async {
     await _player.closePlayer();
+  }
+
+  @override
+  Future<void> stopSound() async{
+   await _player.stopPlayer();
+  }
+
+  @override
+  Future<void> pauseSound() async{
+   await _player.pausePlayer();
+  }
+
+  @override
+  Stream<PlaybackDisposition>? onProgress() {
+     return _player.onProgress;
   }
 }

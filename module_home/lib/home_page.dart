@@ -176,6 +176,11 @@ class _HomePageContentState extends State<HomePageContent>
                             colorMarked: _homeStore.pickerColor),
                       );
                     },
+                    onLongPress: (){
+                      if(context.read<HomeController>().idVerseClicked!=null) {
+                        Navigator.pushNamed(context, NamedRoutes.annotationPage,arguments: context.read<HomeController>().idVerseClicked);
+                      }
+                    },
                     child: VersesWidget(
                         verseModel: value.versesList[index],
                         idVerse: value.versesList[index].id,
