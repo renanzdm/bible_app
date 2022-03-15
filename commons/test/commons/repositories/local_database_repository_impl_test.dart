@@ -30,6 +30,8 @@ Future main() async {
         table: ConfigTable.tableName, values: values.toMap());
     expect(lastRow, 0);
   });
+
+
   test('Create Table', () async {
     final Database db = await openDatabase(inMemoryDatabasePath, version: 1,
         onConfigure: (Database db) async {
@@ -109,4 +111,5 @@ Future main() async {
 
     await db.close();
   });
+
 }

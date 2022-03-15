@@ -38,13 +38,15 @@ class AnnotationController extends ChangeNotifier {
 
   Future<void> getAnnotations({required String id}) async {
     String sql = '''
-    SELECT t1.annotation_audio, t1.annotation_text, t2.book_id,
+    SELECT t1.annotation_audio, t1.annotation_text,t1.fk_verse_marked_id ,
+    t2.book_id,
     t2.chapter_id,t2.verse_id
     FROM  annotation_verses t1
     INNER JOIN verses_marked t2
     ON t1.fk_verse_marked_id = t2.id
+    WHERE t1.fk_verse_marked_id = ?
     ''';
-    var res = await _localService.getValuesCustomQuery(sql: sql);
+    var res = await _localService.getValuesCustomQuery(sql: sql,args: ['32']);
     log(res.toString());
   }
 

@@ -51,7 +51,7 @@ class HomePageContent extends StatefulWidget {
 class _HomePageContentState extends State<HomePageContent>
     with AutomaticKeepAliveClientMixin {
   late AppController _appStore;
-  late HomeController _homeStore;
+  late HomeController _homeController;
   late OverlayEntry _overlayEntry;
   late List<PopupMenuEntry<OptionValue>> listPopButtons;
   final ItemScrollController _scrollController = ItemScrollController();
@@ -68,19 +68,19 @@ class _HomePageContentState extends State<HomePageContent>
   void initState() {
     super.initState();
     _appStore = context.read<AppController>();
-    _homeStore = context.read<HomeController>();
+    _homeController = context.read<HomeController>();
     createOverlaySelectVerse();
     WidgetsBinding.instance?.addPostFrameCallback((Duration timeStamp) async {
-      _scrollController.jumpTo(index: _homeStore.verseSelected.id - 1);
-      await _homeStore.getVersesMarkedOnTable();
-      _homeStore.configureVersesMarked(_appStore.listMarkedModel);
+      _scrollController.jumpTo(index: _homeController.verseSelected.id - 1);
+      await _homeController.getVersesMarkedOnTable();
+      _homeController.configureVersesMarked(_appStore.listMarkedModel);
     });
   }
 
   void createOverlaySelectVerse() {
     _overlayEntry = OverlayEntry(
       builder: (BuildContext context) => ChangeNotifierProvider.value(
-        value: _homeStore,
+        value: _homeController,
         child: OverlayColorPicker(
           onTap: () {
             removeOverlayScreen();
@@ -105,14 +105,14 @@ class _HomePageContentState extends State<HomePageContent>
         actions: [
           ActionsAppBarWidget(
             width: 100,
-            text: _homeStore.bookSelected.nameBook,
+            text: _homeController.bookSelected.nameBook,
             onTap: () {
               Navigator.pop(context, 0);
             },
           ),
           ActionsAppBarWidget(
             width: 60,
-            text: _homeStore.chapterSelected.id.toString(),
+            text: _homeController.chapterSelected.id.toString(),
             onTap: () {
               Navigator.pop(context, 1);
             },
@@ -133,7 +133,7 @@ class _HomePageContentState extends State<HomePageContent>
                       barrierDismissible: false,
                       builder: (context) {
                         return ChangeNotifierProvider.value(
-                          value: _homeStore,
+                          value: _homeController,
                           child: const Center(
                             child: ContentDialogAdjustFont(),
                           ),
@@ -142,7 +142,7 @@ class _HomePageContentState extends State<HomePageContent>
 
                   break;
                 case OptionValue.darkMode:
-                  _homeStore.changeTheme();
+                  _homeController.changeTheme();
                   break;
               }
             },
@@ -160,27 +160,52 @@ class _HomePageContentState extends State<HomePageContent>
             child: SizedBox(
               child: ScrollablePositionedList.builder(
                 physics: const BouncingScrollPhysics(),
-                itemCount: _homeStore.versesList.length,
+                itemCount: _homeController.versesList.length,
                 itemBuilder: (BuildContext context, int index) {
                   return GestureDetector(
                     onTap: () async {
-                      if (!_overlayEntry.mounted) {
-                        Overlay.of(context)!.insert(_overlayEntry);
+                      _homeController.setVerseSelected(index: index);
+                      VersesMarkedModel verseModelSelected = VersesMarkedModel(
+                          bookId: _homeController.bookSelected.id,
+                          chapterId: _homeController.chapterSelected.id,
+                          verseId: _homeController.verseSelected.id,
+                          colorMarked: _homeController.pickerColor);
+                      int id = await _homeController
+                          .alreadyVerseThisBase(verseModelSelected);
+                      print(id);
+                      if (id == -1) {
+                        if (!_overlayEntry.mounted) {
+                          Overlay.of(context)!.insert(_overlayEntry);
+                        }
+                        await _homeController.addVerseMarkedOnTable(
+                            verseMarkedModel: verseModelSelected);
+                        _homeController.changeVerseMarkedStatus(index: index);
+                      } else {
+                        removeOverlayScreen();
+                        await showDialog(
+                          context: context,
+                          builder: (context) {
+                            return ChangeNotifierProvider.value(
+                              value: _homeController,
+                              child: UnmarkedVerseDialog(
+                                id: id,
+                                indexItem: index,
+                              ),
+                            );
+                          },
+                        );
                       }
-                      _homeStore.setVerseModelSelected(index: index);
-                      await _homeStore.addVerseMarkedOnTable(
-                        VersesMarkedModel(
-                            bookId: _homeStore.bookSelected.id,
-                            chapterId: _homeStore.chapterSelected.id,
-                            verseId: _homeStore.verseSelected.id,
-                            colorMarked: _homeStore.pickerColor),
-                      );
                     },
-                    onLongPress: (){
-                      if(context.read<HomeController>().idVerseClicked!=null) {
-                        Navigator.pushNamed(context, NamedRoutes.annotationPage,arguments: context.read<HomeController>().idVerseClicked);
-                      }
-                    },
+                    onLongPress: _homeController.verseSelected.isMarked
+                        ? () async {
+                            int idMarkedVerse = await context
+                                .read<HomeController>()
+                                .getIdVerseOnDatabase();
+                            // if(idMarkedVerse!=-1) {
+                            //   Navigator.pushNamed(context, NamedRoutes.annotationPage,arguments: idMarkedVerse);
+                            // }
+                          }
+                        : null,
                     child: VersesWidget(
                         verseModel: value.versesList[index],
                         idVerse: value.versesList[index].id,
@@ -204,7 +229,7 @@ class _HomePageContentState extends State<HomePageContent>
   }
 
   void setDefaultValuesBible(HomeScreenArguments args) {
-    _homeStore.setDefaultValuesBible(
+    _homeController.setDefaultValuesBible(
       verseModel: args.verseModel,
       chapterModel: args.chapterModel,
       bookModel: args.bookModel,
@@ -232,4 +257,64 @@ class _HomePageContentState extends State<HomePageContent>
 
   @override
   bool get wantKeepAlive => true;
+}
+
+class UnmarkedVerseDialog extends StatelessWidget {
+  const UnmarkedVerseDialog({
+    Key? key,
+    required this.id,
+    required this.indexItem,
+  }) : super(key: key);
+
+  final int id;
+  final int indexItem;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: PhysicalModel(
+        color: Colors.white,
+        elevation: 10,
+        borderRadius: BorderRadius.circular(12),
+        shadowColor: Colors.black,
+        child: Container(
+          alignment: Alignment.center,
+          width: SizeOfWidget.sizeFromWidth(context, factor: 0.7),
+          height: SizeOfWidget.sizeFromWidth(context, factor: 0.5),
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+               Text('Deseja Desmarcar esse versiculo ?',style: Theme.of(context).textTheme.headline6,),
+              const SizedBox(height: 3.0,),
+              DottedLine(width: SizeOfWidget.sizeFromWidth(context),color: Theme.of(context).backgroundColor,),
+              const SizedBox(height: 20.0,),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                      onPressed: () async {
+                        await context
+                            .read<HomeController>()
+                            .deleteVerseMarkedOnTable(id: id);
+                        context
+                            .read<HomeController>()
+                            .changeVerseMarkedStatus(index: indexItem);
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Confirmar')),
+                  const SizedBox(width: 30.0,),
+                  ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Cancelar')),
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

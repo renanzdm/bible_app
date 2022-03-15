@@ -33,7 +33,7 @@ class VersesWidget extends StatelessWidget {
               children: [
                 TextSpan(
                   text: verseModel.verse,
-                  style: Theme.of(context).textTheme.headline6?.copyWith(
+                  style: Theme.of(context).textTheme.headline5?.copyWith(
                       fontSize: value
                           .config
                           .fontSizeVerse

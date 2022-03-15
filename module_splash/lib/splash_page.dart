@@ -23,7 +23,7 @@ class _SplashPageState extends State<SplashPage> {
       await _appStore.createTables();
       await _appStore.insertValueDefaultOnConfigTable();
       await _appStore.configureVersionsBible();
-      await Future.delayed(const Duration(milliseconds: 500));
+      await Future.delayed(const Duration(milliseconds: 100));
       Navigator.pushReplacementNamed(context, NamedRoutes.summaryPage);
     });
     super.initState();
