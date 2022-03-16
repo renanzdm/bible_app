@@ -9,9 +9,6 @@ class ThemeApp {
   static ThemeData theme(BuildContext context) {
     AppController _appStore = context.watch<AppController>();
     return ThemeData(
-      textTheme: TextTheme(
-        headline6: TextStyle(color: Colors.grey.shade700,)
-      ),
       colorScheme: () {
         if (_appStore.config.isDark) {
           return colorSchemaDark;

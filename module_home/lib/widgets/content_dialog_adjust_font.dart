@@ -24,19 +24,10 @@ class _ContentDialogAdjustFontState extends State<ContentDialogAdjustFont> {
       child: Material(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(22.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Align(
-                alignment: Alignment.topRight,
-                child: IconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: const Icon(Icons.close,color: Colors.black38,),
-                ),
-              ),
               Text(
               'Ajuste sua fonte',
                 style: Theme.of(context).textTheme.headline6,

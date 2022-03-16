@@ -22,7 +22,6 @@ class AnnotationPage extends StatelessWidget {
             localDatabaseService: LocalDatabaseServiceImpl(
                 localDatabaseRepository: LocalDatabaseRepositoryImpl(
                     database: LocalDatabaseInstance())),
-
           ),
         ),
         ChangeNotifierProvider(
@@ -52,13 +51,14 @@ class _AnnotationPageContentState extends State<AnnotationPageContent> {
   void initState() {
     super.initState();
     _annotationStore = context.read<AnnotationController>();
+    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+      _annotationStore.getAnnotations(id: verseId.toString());
+    });
   }
-
 
   @override
   Widget build(BuildContext context) {
     verseId = ModalRoute.of(context)?.settings.arguments as int;
-    _annotationStore.getAnnotations(id: verseId.toString());
     return Scaffold(
       appBar: AppBar(
         title: const Text('Criar Anotacao'),

@@ -59,12 +59,6 @@ class _HomePageContentState extends State<HomePageContent>
       ItemPositionsListener.create();
 
   @override
-  void dispose() {
-    removeOverlayScreen();
-    super.dispose();
-  }
-
-  @override
   void initState() {
     super.initState();
     _appStore = context.read<AppController>();
@@ -73,7 +67,7 @@ class _HomePageContentState extends State<HomePageContent>
     WidgetsBinding.instance?.addPostFrameCallback((Duration timeStamp) async {
       _scrollController.jumpTo(index: _homeController.verseSelected.id - 1);
       await _homeController.getVersesMarkedOnTable();
-      _homeController.configureVersesMarked(_appStore.listMarkedModel);
+      _homeController.configureVersesMarked(_homeController.listMarkedModel);
     });
   }
 
@@ -82,7 +76,7 @@ class _HomePageContentState extends State<HomePageContent>
       builder: (BuildContext context) => ChangeNotifierProvider.value(
         value: _homeController,
         child: OverlayColorPicker(
-          onTap: () {
+          onTapRemoveThisOverlay: () {
             removeOverlayScreen();
           },
         ),
@@ -102,19 +96,26 @@ class _HomePageContentState extends State<HomePageContent>
     generatePopUpButtons(context);
     return Scaffold(
       appBar: AppBarWidget(
+        onTapLeading: () {
+          removeOverlayScreen();
+          Navigator.pop(context);
+        },
         actions: [
           ActionsAppBarWidget(
             width: 100,
             text: _homeController.bookSelected.nameBook,
             onTap: () {
-              Navigator.pop(context, 0);
+              int tabBook = 0;
+              Navigator.pop(context, tabBook);
             },
           ),
           ActionsAppBarWidget(
             width: 60,
             text: _homeController.chapterSelected.id.toString(),
             onTap: () {
-              Navigator.pop(context, 1);
+              int tabChapters = 1;
+
+              Navigator.pop(context, tabChapters);
             },
           ),
           ActionsAppBarWidget(
@@ -130,7 +131,6 @@ class _HomePageContentState extends State<HomePageContent>
                 case OptionValue.adjustFont:
                   await showDialog(
                       context: context,
-                      barrierDismissible: false,
                       builder: (context) {
                         return ChangeNotifierProvider.value(
                           value: _homeController,
@@ -164,48 +164,13 @@ class _HomePageContentState extends State<HomePageContent>
                 itemBuilder: (BuildContext context, int index) {
                   return GestureDetector(
                     onTap: () async {
-                      _homeController.setVerseSelected(index: index);
-                      VersesMarkedModel verseModelSelected = VersesMarkedModel(
-                          bookId: _homeController.bookSelected.id,
-                          chapterId: _homeController.chapterSelected.id,
-                          verseId: _homeController.verseSelected.id,
-                          colorMarked: _homeController.pickerColor);
-                      int id = await _homeController
-                          .alreadyVerseThisBase(verseModelSelected);
-                      print(id);
-                      if (id == -1) {
-                        if (!_overlayEntry.mounted) {
-                          Overlay.of(context)!.insert(_overlayEntry);
-                        }
-                        await _homeController.addVerseMarkedOnTable(
-                            verseMarkedModel: verseModelSelected);
-                        _homeController.changeVerseMarkedStatus(index: index);
-                      } else {
-                        removeOverlayScreen();
-                        await showDialog(
-                          context: context,
-                          builder: (context) {
-                            return ChangeNotifierProvider.value(
-                              value: _homeController,
-                              child: UnmarkedVerseDialog(
-                                id: id,
-                                indexItem: index,
-                              ),
-                            );
-                          },
-                        );
+                      if (!_overlayEntry.mounted) {
+                        Overlay.of(context)!.insert(_overlayEntry);
                       }
+                      _homeController.setVerseSelected(index: index);
+                      _homeController.setIndexVerseClicked(index);
+                      await _homeController.getIdVerseOnDatabase();
                     },
-                    onLongPress: _homeController.verseSelected.isMarked
-                        ? () async {
-                            int idMarkedVerse = await context
-                                .read<HomeController>()
-                                .getIdVerseOnDatabase();
-                            // if(idMarkedVerse!=-1) {
-                            //   Navigator.pushNamed(context, NamedRoutes.annotationPage,arguments: idMarkedVerse);
-                            // }
-                          }
-                        : null,
                     child: VersesWidget(
                         verseModel: value.versesList[index],
                         idVerse: value.versesList[index].id,
@@ -257,64 +222,4 @@ class _HomePageContentState extends State<HomePageContent>
 
   @override
   bool get wantKeepAlive => true;
-}
-
-class UnmarkedVerseDialog extends StatelessWidget {
-  const UnmarkedVerseDialog({
-    Key? key,
-    required this.id,
-    required this.indexItem,
-  }) : super(key: key);
-
-  final int id;
-  final int indexItem;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: PhysicalModel(
-        color: Colors.white,
-        elevation: 10,
-        borderRadius: BorderRadius.circular(12),
-        shadowColor: Colors.black,
-        child: Container(
-          alignment: Alignment.center,
-          width: SizeOfWidget.sizeFromWidth(context, factor: 0.7),
-          height: SizeOfWidget.sizeFromWidth(context, factor: 0.5),
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-               Text('Deseja Desmarcar esse versiculo ?',style: Theme.of(context).textTheme.headline6,),
-              const SizedBox(height: 3.0,),
-              DottedLine(width: SizeOfWidget.sizeFromWidth(context),color: Theme.of(context).backgroundColor,),
-              const SizedBox(height: 20.0,),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                      onPressed: () async {
-                        await context
-                            .read<HomeController>()
-                            .deleteVerseMarkedOnTable(id: id);
-                        context
-                            .read<HomeController>()
-                            .changeVerseMarkedStatus(index: indexItem);
-                        Navigator.pop(context);
-                      },
-                      child: const Text('Confirmar')),
-                  const SizedBox(width: 30.0,),
-                  ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text('Cancelar')),
-                ],
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 }

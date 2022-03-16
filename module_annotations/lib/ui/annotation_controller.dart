@@ -46,7 +46,7 @@ class AnnotationController extends ChangeNotifier {
     ON t1.fk_verse_marked_id = t2.id
     WHERE t1.fk_verse_marked_id = ?
     ''';
-    var res = await _localService.getValuesCustomQuery(sql: sql,args: ['32']);
+    var res = await _localService.getValuesCustomQuery(sql: sql,args: [id.toString()]);
     log(res.toString());
   }
 

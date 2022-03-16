@@ -16,7 +16,6 @@ class AppController extends ChangeNotifier implements ReassembleHandler {
   ConfigModel config = const ConfigModel();
   BibleModel bibleModel = BibleModel();
   List<VersionsModel> versionsBible = <VersionsModel>[];
-  List<VersesMarkedModel> listMarkedModel = <VersesMarkedModel>[];
 
   Future<void> updateConfigTable() async {
     await _localService.updateValue(
