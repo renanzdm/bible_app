@@ -1,3 +1,4 @@
+import 'package:commons/commons/controller/app_controller.dart';
 import 'package:commons/commons/local_database/local_database_instance.dart';
 import 'package:commons/commons/repositories/local_database_repository_impl.dart';
 import 'package:commons/commons/services/local_database_service_impl.dart';
@@ -6,7 +7,10 @@ import 'package:commons_dependencies/main.dart';
 import 'package:flutter/material.dart';
 import 'package:module_annotations/services/record_service/record_service_impl.dart';
 import 'package:module_annotations/services/sound_service/sound_service_impl.dart';
+import 'package:module_annotations/ui/widgets/annotation_widget/annotation_widget_audio.dart';
+import 'package:module_annotations/utils/utils.dart';
 import 'annotation_controller.dart';
+import 'widgets/annotation_widget/annotation_widget_text.dart';
 import 'widgets/record_audio_widget/record_audio_controller.dart';
 import 'widgets/record_audio_widget/record_audio_widget.dart';
 
@@ -44,6 +48,7 @@ class AnnotationPageContent extends StatefulWidget {
 class _AnnotationPageContentState extends State<AnnotationPageContent> {
   late int verseId;
   late AnnotationController _annotationStore;
+  late AppController _appController;
   int maxLength = 500;
   String textValue = '';
 
@@ -51,6 +56,7 @@ class _AnnotationPageContentState extends State<AnnotationPageContent> {
   void initState() {
     super.initState();
     _annotationStore = context.read<AnnotationController>();
+    _appController = context.read<AppController>();
     WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
       _annotationStore.getAnnotations(id: verseId.toString());
     });
@@ -67,6 +73,7 @@ class _AnnotationPageContentState extends State<AnnotationPageContent> {
         children: [
           Expanded(
             child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
               child: Column(
                 children: [
                   Padding(
@@ -96,6 +103,23 @@ class _AnnotationPageContentState extends State<AnnotationPageContent> {
                       ],
                     ),
                   ),
+                  ..._annotationStore.listAnnotations
+                      .map(
+                        (e) => Visibility(
+                          visible: e.audioAnnotationPath.isEmpty,
+                          child: AnnotationWidgetText(
+                            verseNumber: e.verseId,
+                            chapterNumber: e.chapterId,
+                            bookName: Utils.getNameBook(idBook: e.bookId, bibleModel:_appController.bibleModel),
+                          ),
+                          replacement: AnnotationWidgetAudio(
+                            verseNumber: e.verseId,
+                            chapterNumber: e.chapterId,
+                            bookName: Utils.getNameBook(idBook: e.bookId, bibleModel:_appController.bibleModel),
+                          ),
+                        ),
+                      )
+                      .toList(),
                 ],
               ),
             ),

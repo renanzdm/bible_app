@@ -1,6 +1,7 @@
+import 'package:commons/main.dart';
 import 'package:flutter/cupertino.dart';
 
-import '../utils/tables_info.dart';
+
 
 class VersesMarkedModel {
   final int id;

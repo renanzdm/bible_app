@@ -2,7 +2,6 @@ import 'package:commons_dependencies/main.dart';
 import 'package:flutter/material.dart';
 import '../models/bible_model.dart';
 import '../models/config_model.dart';
-import '../models/verses_marked_model.dart';
 import '../models/version_model.dart';
 import '../services/local_database_service.dart';
 import '../utils/tables_info.dart';

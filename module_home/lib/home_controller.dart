@@ -2,11 +2,13 @@ import 'package:commons/commons/controller/app_controller.dart';
 import 'package:commons/commons/models/book_model.dart';
 import 'package:commons/commons/models/chapter_model.dart';
 import 'package:commons/commons/models/verse_model.dart';
-import 'package:commons/commons/models/verses_marked_model.dart';
+
 import 'package:commons/commons/services/local_database_service.dart';
 import 'package:commons/main.dart';
 import 'package:commons_dependencies/main.dart';
 import 'package:flutter/material.dart';
+
+import 'models/verses_marked_model.dart';
 
 class HomeController extends ChangeNotifier implements ReassembleHandler {
   HomeController(

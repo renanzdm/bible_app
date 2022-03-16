@@ -1,13 +1,14 @@
 
-import '../utils/tables_info.dart';
 
-class AnnotationVersesMarkedModel {
+import 'package:commons/main.dart';
+
+class AnnotationInsertModel {
   final int id;
   final int fkVersesMarked;
   final String annotationText;
   final String annotationAudio;
 
-  const AnnotationVersesMarkedModel({
+  const AnnotationInsertModel({
     this.id = -1,
     this.fkVersesMarked = -1,
     this.annotationText = '',
@@ -23,8 +24,8 @@ class AnnotationVersesMarkedModel {
     };
   }
 
-  factory AnnotationVersesMarkedModel.fromMap(Map<String, dynamic> map) {
-    return AnnotationVersesMarkedModel(
+  factory AnnotationInsertModel.fromMap(Map<String, dynamic> map) {
+    return AnnotationInsertModel(
       id: map[AnnotationsVersesTable.id] as int,
       fkVersesMarked: map[AnnotationsVersesTable.fkVerseMarkedId] as int,
       annotationText: map[AnnotationsVersesTable.annotationText] as String,
@@ -32,13 +33,13 @@ class AnnotationVersesMarkedModel {
     );
   }
 
-  AnnotationVersesMarkedModel copyWith({
+  AnnotationInsertModel copyWith({
     int? id,
     int? fkVersesMarked,
     String? annotationText,
     String? annotationAudio,
   }) {
-    return AnnotationVersesMarkedModel(
+    return AnnotationInsertModel(
       id: id ?? this.id,
       fkVersesMarked: fkVersesMarked ?? this.fkVersesMarked,
       annotationText: annotationText ?? this.annotationText,

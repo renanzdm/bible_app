@@ -1,10 +1,10 @@
-import 'dart:developer';
-
-import 'package:commons/commons/models/annotation_verses_marked_model.dart';
 import 'package:commons/commons/services/local_database_service.dart';
 import 'package:commons/main.dart';
 import 'package:commons_dependencies/main.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:module_annotations/model/annotation_model.dart';
+
+import '../model/annotation_insert_model.dart';
 
 class AnnotationController extends ChangeNotifier {
   AnnotationController({
@@ -15,6 +15,7 @@ class AnnotationController extends ChangeNotifier {
 
   final LocalDatabaseService _localService;
   String pathAudioCurrent = '';
+   List<AnnotationModel> listAnnotations = <AnnotationModel>[];
 
   void setAudioPath(String pathAudio) {
     pathAudioCurrent = pathAudio;
@@ -22,10 +23,10 @@ class AnnotationController extends ChangeNotifier {
   }
 
   Future<void> insertAnnotation(
-      {AnnotationVersesMarkedModel? annotationModel,
+      {AnnotationInsertModel? annotationModel,
       required int verseId,
       String? text}) async {
-    annotationModel ??= const AnnotationVersesMarkedModel();
+    annotationModel ??= const AnnotationInsertModel();
     annotationModel = annotationModel.copyWith(
       annotationAudio: pathAudioCurrent,
       annotationText: text,
@@ -46,8 +47,10 @@ class AnnotationController extends ChangeNotifier {
     ON t1.fk_verse_marked_id = t2.id
     WHERE t1.fk_verse_marked_id = ?
     ''';
-    var res = await _localService.getValuesCustomQuery(sql: sql,args: [id.toString()]);
-    log(res.toString());
+    var res = await _localService
+        .getValuesCustomQuery(sql: sql, args: [id.toString()]);
+    listAnnotations = res.map((e) => AnnotationModel.fromMap(e)).toList();
+    notifyListeners();
   }
 
   Future<bool> getPermissions() async {

@@ -1,6 +1,5 @@
 import 'package:commons/commons/controller/app_controller.dart';
 import 'package:commons/commons/local_database/local_database_instance.dart';
-import 'package:commons/commons/models/verses_marked_model.dart';
 import 'package:commons/commons/repositories/local_database_repository_impl.dart';
 import 'package:commons/commons/services/local_database_service_impl.dart';
 import 'package:commons/main.dart';
