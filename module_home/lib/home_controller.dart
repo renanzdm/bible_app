@@ -83,12 +83,12 @@ class HomeController extends ChangeNotifier implements ReassembleHandler {
 
   Future<void> addVerseMarkedOnTable({required Color color}) async {
     if (verseIfExists.id == -1) {
+      changeColor(color: color);
       VersesMarkedModel verseModelSelected = VersesMarkedModel(
           bookId: bookSelected.id,
           chapterId: chapterSelected.id,
           verseId: verseSelected.id,
           colorMarked: pickerColor);
-      changeColor(color: color);
       changeVerseMarkedStatus(valueForMarked: true);
       int idItemInserted = await _localService.insertValues(
           table: VersesMarkedTable.tableName,

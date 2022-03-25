@@ -5,12 +5,14 @@ import 'package:commons/commons/services/local_database_service_impl.dart';
 import 'package:commons/main.dart';
 import 'package:commons_dependencies/main.dart';
 import 'package:flutter/material.dart';
+import 'package:module_annotations/model/annotation_model.dart';
 import 'package:module_annotations/services/record_service/record_service_impl.dart';
 import 'package:module_annotations/services/sound_service/sound_service_impl.dart';
-import 'package:module_annotations/ui/widgets/annotation_widget/annotation_widget_audio.dart';
+import 'package:module_annotations/ui/widgets/annotation_widget_sound/annotation_sound_controller.dart';
+import 'package:module_annotations/ui/widgets/annotation_widget_sound/annotation_widget_audio.dart';
 import 'package:module_annotations/utils/utils.dart';
 import 'annotation_controller.dart';
-import 'widgets/annotation_widget/annotation_widget_text.dart';
+import 'widgets/annotation_widget_text/annotation_widget_text.dart';
 import 'widgets/record_audio_widget/record_audio_controller.dart';
 import 'widgets/record_audio_widget/record_audio_widget.dart';
 
@@ -51,6 +53,8 @@ class _AnnotationPageContentState extends State<AnnotationPageContent> {
   late AppController _appController;
   int maxLength = 500;
   String textValue = '';
+
+
 
   @override
   void initState() {
@@ -105,17 +109,19 @@ class _AnnotationPageContentState extends State<AnnotationPageContent> {
                   ),
                   ..._annotationStore.listAnnotations
                       .map(
-                        (e) => Visibility(
-                          visible: e.audioAnnotationPath.isEmpty,
+                        (AnnotationModel annotation) => Visibility(
+                          visible: annotation.audioAnnotationPath.isEmpty,
                           child: AnnotationWidgetText(
-                            verseNumber: e.verseId,
-                            chapterNumber: e.chapterId,
-                            bookName: Utils.getNameBook(idBook: e.bookId, bibleModel:_appController.bibleModel),
+                            annotationModel: annotation,
+                            bookName: Utils.getNameBook(
+                                idBook: annotation.bookId,
+                                bibleModel: _appController.bibleModel),
                           ),
                           replacement: AnnotationWidgetAudio(
-                            verseNumber: e.verseId,
-                            chapterNumber: e.chapterId,
-                            bookName: Utils.getNameBook(idBook: e.bookId, bibleModel:_appController.bibleModel),
+                            bookName: Utils.getNameBook(
+                                idBook: annotation.bookId,
+                                bibleModel: _appController.bibleModel),
+                            annotationModel: annotation,
                           ),
                         ),
                       )

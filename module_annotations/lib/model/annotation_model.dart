@@ -2,7 +2,6 @@ import 'package:commons/commons/utils/tables_info.dart';
 
 class AnnotationModel {
   final String audioAnnotationPath;
-
   final String textAnnotation;
   final int fkMarkedVerseID;
   final int bookId;

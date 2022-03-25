@@ -121,7 +121,14 @@ class _RecordAudioWidgetState extends State<RecordAudioWidget> {
         const SizedBox(
           height: 60,
         ),
-        DecibelsWidget()
+        Consumer<RecordAudioController>(
+          builder: (context, value, child) {
+            return Visibility(
+              visible: value.isRecorder,
+              child: DecibelsWidget(),
+            );
+          },
+        )
       ],
     );
   }

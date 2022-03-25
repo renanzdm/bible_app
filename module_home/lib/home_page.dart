@@ -93,95 +93,96 @@ class _HomePageContentState extends State<HomePageContent>
     HomeScreenArguments args = getRouteArguments(context);
     setDefaultValuesBible(args);
     generatePopUpButtons(context);
-    return Scaffold(
-      appBar: AppBarWidget(
-        onTapLeading: () {
-          removeOverlayScreen();
-          Navigator.pop(context);
-        },
-        actions: [
-          ActionsAppBarWidget(
-            width: 100,
-            text: _homeController.bookSelected.nameBook,
-            onTap: () {
-              int tabBook = 0;
-              Navigator.pop(context, tabBook);
-            },
-          ),
-          ActionsAppBarWidget(
-            width: 60,
-            text: _homeController.chapterSelected.id.toString(),
-            onTap: () {
-              int tabChapters = 1;
-
-              Navigator.pop(context, tabChapters);
-            },
-          ),
-          ActionsAppBarWidget(
-            width: 60,
-            text: _appStore.config.versionBible,
-            fontSize: 12,
-            onTap: () =>
-                Navigator.pushNamed(context, NamedRoutes.configVersionsPage),
-          ),
-          PopupMenuButton<OptionValue>(
-            onSelected: (OptionValue value) async {
-              switch (value) {
-                case OptionValue.adjustFont:
-                  await showDialog(
-                      context: context,
-                      builder: (context) {
-                        return ChangeNotifierProvider.value(
-                          value: _homeController,
-                          child: const Center(
-                            child: ContentDialogAdjustFont(),
-                          ),
-                        );
-                      });
-
-                  break;
-                case OptionValue.darkMode:
-                  _homeController.changeTheme();
-                  break;
-              }
-            },
-            icon: const Icon(Icons.more_vert_outlined),
-            itemBuilder: (BuildContext context) {
-              return listPopButtons;
-            },
-          ),
-        ],
-      ),
-      body: Consumer<HomeController>(
-        builder: (BuildContext context, HomeController value, Widget? child) {
-          return Padding(
-            padding: ScaffoldPadding.horizontal,
-            child: SizedBox(
-              child: ScrollablePositionedList.builder(
-                physics: const BouncingScrollPhysics(),
-                itemCount: _homeController.versesList.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return GestureDetector(
-                    onTap: () async {
-                      if (!_overlayEntry.mounted) {
-                        Overlay.of(context)!.insert(_overlayEntry);
-                      }
-                      _homeController.setVerseSelected(index: index);
-                      _homeController.setIndexVerseClicked(index);
-                      await _homeController.getIdVerseOnDatabase();
-                    },
-                    child: VersesWidget(
-                        verseModel: value.versesList[index],
-                        idVerse: value.versesList[index].id,
-                        indexItem: index),
-                  );
-                },
-                itemScrollController: _scrollController,
-                itemPositionsListener: itemPositionsListener,
-              ),
+    return WillPopScope(
+      onWillPop: () async{
+        removeOverlayScreen();
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBarWidget(
+          actions: [
+            ActionsAppBarWidget(
+              width: 100,
+              text: _homeController.bookSelected.nameBook,
+              onTap: () {
+                int tabBook = 0;
+                Navigator.pop(context, tabBook);
+              },
             ),
-          );
-        },
+            ActionsAppBarWidget(
+              width: 60,
+              text: _homeController.chapterSelected.id.toString(),
+              onTap: () {
+                int tabChapters = 1;
+                Navigator.pop(context, tabChapters);
+              },
+            ),
+            ActionsAppBarWidget(
+              width: 60,
+              text: _appStore.config.versionBible,
+              fontSize: 12,
+              onTap: () =>
+                  Navigator.pushNamed(context, NamedRoutes.configVersionsPage),
+            ),
+            PopupMenuButton<OptionValue>(
+              onSelected: (OptionValue value) async {
+                switch (value) {
+                  case OptionValue.adjustFont:
+                    await showDialog(
+                        context: context,
+                        builder: (context) {
+                          return ChangeNotifierProvider.value(
+                            value: _homeController,
+                            child: const Center(
+                              child: ContentDialogAdjustFont(),
+                            ),
+                          );
+                        });
+
+                    break;
+                  case OptionValue.darkMode:
+                    _homeController.changeTheme();
+                    break;
+                }
+              },
+              icon: const Icon(Icons.more_vert_outlined),
+              itemBuilder: (BuildContext context) {
+                return listPopButtons;
+              },
+            ),
+          ],
+        ),
+        body: Consumer<HomeController>(
+          builder: (BuildContext context, HomeController value, Widget? child) {
+            return Padding(
+              padding: ScaffoldPadding.horizontal,
+              child: SizedBox(
+                child: ScrollablePositionedList.builder(
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: _homeController.versesList.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return GestureDetector(
+                      onTap: () async {
+                        if (!_overlayEntry.mounted) {
+                          Overlay.of(context)!.insert(_overlayEntry);
+                        }
+                        _homeController.setVerseSelected(index: index);
+                        _homeController.setIndexVerseClicked(index);
+                        await _homeController.getIdVerseOnDatabase();
+                      },
+                      child: VersesWidget(
+                          verseModel: value.versesList[index],
+                          idVerse: value.versesList[index].id,
+                          indexItem: index),
+                    );
+                  },
+                  itemScrollController: _scrollController,
+                  itemPositionsListener: itemPositionsListener,
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }

@@ -50,6 +50,7 @@ class AnnotationController extends ChangeNotifier {
     var res = await _localService
         .getValuesCustomQuery(sql: sql, args: [id.toString()]);
     listAnnotations = res.map((e) => AnnotationModel.fromMap(e)).toList();
+    print(listAnnotations);
     notifyListeners();
   }
 

@@ -32,7 +32,36 @@ class SoundServiceImpl implements SoundService {
   }
 
   @override
-  Stream<PlaybackDisposition>? onProgress() {
+  Stream<PlaybackDisposition>? get onProgress {
      return _player.onProgress;
   }
+
+  @override
+  Future<void> setDurationUpdateOnProgress({Duration duration = const Duration(milliseconds: 100)}) async {
+   _player.setSubscriptionDuration(duration);
+  }
+
+  @override
+  Future<void> seekToPlayer({required Duration duration})async {
+    await _player.seekToPlayer(duration);
+  }
+
+  @override
+  bool get isPlaying => _player.isPlaying;
+
+
+  @override
+  Future<void> resumeSound()async {
+  await _player.resumePlayer();
+  }
+
+  @override
+  Future<PlayerState> getPlayerState()async {
+   return _player.getPlayerState();
+  }
+
+
+
+
+
 }

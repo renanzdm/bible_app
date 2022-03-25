@@ -70,6 +70,7 @@ class AppController extends ChangeNotifier implements ReassembleHandler {
     var response = await getConfigModel();
     if (response.isEmpty) await insertConfigTable();
     if (response.isNotEmpty) config = response.first;
+    notifyListeners();
   }
 
   Future<void> configureVersionsBible() async {

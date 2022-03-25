@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:commons_dependencies/main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:module_annotations/services/record_service/record_service.dart';
@@ -35,7 +37,7 @@ class RecordAudioController extends ChangeNotifier
   }
 
   Future<void> startRecorder(String id) async {
-    String pathToSave = 'annotations_audio_$id.aac';
+    String pathToSave = 'annotations_audio_${DateTime.now().millisecondsSinceEpoch}.aac';
     await _recordService.startRecord(pathToSave: pathToSave);
     getIsRecorder();
     timer.start();
