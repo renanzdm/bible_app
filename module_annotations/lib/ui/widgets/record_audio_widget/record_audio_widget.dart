@@ -1,135 +1,120 @@
 import 'package:flutter/material.dart';
 import 'package:commons/commons/utils/sizes.dart';
-import '../../annotation_controller.dart';
+import 'package:module_annotations/services/record_service/record_service_impl.dart';
+import 'package:module_annotations/ui/widgets/record_audio_widget/bloc/record_audio_bloc.dart';
+import 'package:module_annotations/ui/widgets/record_audio_widget/bloc/record_audio_state.dart';
+import '../../bloc/annotations_bloc.dart';
 import '../decibels_widget/decibels_widget.dart';
 import '../timer_record_widget/timer_recorder_widget.dart';
-import 'record_audio_controller.dart';
+import 'bloc/record_audio_event.dart';
 import 'package:commons_dependencies/main.dart';
 
-class RecordAudioWidget extends StatefulWidget {
-  const RecordAudioWidget({Key? key, required this.verseId}) : super(key: key);
+
+
+class RecordAudioWidget extends StatelessWidget {
+  const RecordAudioWidget({Key? key, required this.verseId})
+      : super(key: key);
   final String verseId;
 
   @override
-  State<RecordAudioWidget> createState() => _RecordAudioWidgetState();
-}
-
-class _RecordAudioWidgetState extends State<RecordAudioWidget> {
-  late RecordAudioController _recordAudioController;
-  late AnnotationController _annotationStore;
-
-  @override
-  void initState() {
-    super.initState();
-    _recordAudioController = context.read<RecordAudioController>();
-    _annotationStore = context.read<AnnotationController>();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _recordAudioController.closeAudioRecordSession();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const TimerRecordWidget(),
-        Consumer<RecordAudioController>(
-          builder: (BuildContext context, RecordAudioController value,
-              Widget? child) {
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  height: SizeOfWidget.sizeFromHeight(context, factor: .07),
-                  width: SizeOfWidget.sizeFromHeight(context, factor: .07),
-                  margin: const EdgeInsets.all(8.0),
-                  alignment: Alignment.center,
-                  decoration: const BoxDecoration(
-                      shape: BoxShape.circle, color: Colors.red),
-                  child: GestureDetector(
-                    onTap: () async {
-                      if (!value.isRecorder) {
-                        await value.resumeRecorder();
-                      }
-                    },
-                    child: const Icon(
-                      Icons.play_arrow,
-                      color: Colors.white,
-                      size: 30,
-                    ),
-                  ),
-                ),
-                Container(
-                  height: SizeOfWidget.sizeFromHeight(context, factor: .1),
-                  width: SizeOfWidget.sizeFromHeight(context, factor: .1),
-                  margin: const EdgeInsets.all(8.0),
-                  alignment: Alignment.center,
-                  decoration: const BoxDecoration(
-                      shape: BoxShape.circle, color: Colors.red),
-                  child: GestureDetector(
-                    onTap: () async {
-                      value.getIsStopped();
-                      if (value.isRecorder) {
-                        _annotationStore
-                            .setAudioPath(await value.stopRecorder() ?? '');
-                      } else if (value.isStopped) {
-                        await value.startRecorder(widget.verseId);
-                      }
-                    },
-                    child: Visibility(
-                      visible: value.isRecorder,
+    return WillPopScope(
+      onWillPop: ()async {
+        context.read<RecordAudioBloc>().add(DisposeResourcesAudio());
+        return true;
+      },
+      child: BlocConsumer<RecordAudioBloc, RecordAudioState>(
+        listener: (context, state) {},
+        builder: (BuildContext context, RecordAudioState state) {
+          return Column(
+            children: [
+              const TimerRecordWidget(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    height: SizeOfWidget.sizeFromHeight(context, factor: .07),
+                    width: SizeOfWidget.sizeFromHeight(context, factor: .07),
+                    margin: const EdgeInsets.all(8.0),
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(
+                        shape: BoxShape.circle, color: Colors.red),
+                    child: GestureDetector(
+                      onTap: () async {
+                        if (state.isPaused) {
+                          context.read<RecordAudioBloc>().add(ResumeRecorder());
+                        }
+                      },
                       child: const Icon(
-                        Icons.stop,
-                        color: Colors.white,
-                        size: 30,
-                      ),
-                      replacement: const Icon(
-                        Icons.mic,
+                        Icons.play_arrow,
                         color: Colors.white,
                         size: 30,
                       ),
                     ),
                   ),
-                ),
-                Container(
-                  height: SizeOfWidget.sizeFromHeight(context, factor: .07),
-                  width: SizeOfWidget.sizeFromHeight(context, factor: .07),
-                  margin: const EdgeInsets.all(8.0),
-                  alignment: Alignment.center,
-                  decoration: const BoxDecoration(
-                      shape: BoxShape.circle, color: Colors.red),
-                  child: GestureDetector(
-                    onTap: () async {
-                      if (value.isRecorder) {
-                        await value.pauseRecorder();
-                      }
-                    },
-                    child: const Icon(
-                      Icons.pause,
-                      color: Colors.white,
-                      size: 30,
+                  Container(
+                    height: SizeOfWidget.sizeFromHeight(context, factor: .1),
+                    width: SizeOfWidget.sizeFromHeight(context, factor: .1),
+                    margin: const EdgeInsets.all(8.0),
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(
+                        shape: BoxShape.circle, color: Colors.red),
+                    child: GestureDetector(
+                      onTap: () async {
+                        if (state.isRunning) {
+                          context.read<RecordAudioBloc>().add(StopRecorder());
+                        } else if (state.isStopped) {
+                          context.read<RecordAudioBloc>().add(StartRecorder());
+                        }
+                      },
+                      child: Visibility(
+                        visible: state.isRunning,
+                        child: const Icon(
+                          Icons.stop,
+                          color: Colors.white,
+                          size: 30,
+                        ),
+                        replacement: const Icon(
+                          Icons.mic,
+                          color: Colors.white,
+                          size: 30,
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ],
-            );
-          },
-        ),
-        const SizedBox(
-          height: 60,
-        ),
-        Consumer<RecordAudioController>(
-          builder: (context, value, child) {
-            return Visibility(
-              visible: value.isRecorder,
-              child: DecibelsWidget(),
-            );
-          },
-        )
-      ],
+                  Container(
+                    height: SizeOfWidget.sizeFromHeight(context, factor: .07),
+                    width: SizeOfWidget.sizeFromHeight(context, factor: .07),
+                    margin: const EdgeInsets.all(8.0),
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(
+                        shape: BoxShape.circle, color: Colors.red),
+                    child: GestureDetector(
+                      onTap: () async {
+                        if (state.isRunning) {
+                          context.read<RecordAudioBloc>().add(PauseRecorder());
+                        }
+                      },
+                      child: const Icon(
+                        Icons.pause,
+                        color: Colors.white,
+                        size: 30,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 60,
+              ),
+              Visibility(
+                visible: state.isRunning,
+                child: DecibelsWidget(),
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 }

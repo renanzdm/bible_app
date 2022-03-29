@@ -16,7 +16,7 @@ class UnmarkedVerseDialog extends StatelessWidget {
         child: Container(
           alignment: Alignment.center,
           width: SizeOfWidget.sizeFromWidth(context, factor: 0.7),
-          height: SizeOfWidget.sizeFromHeight(context, factor: .3),
+          height: SizeOfWidget.sizeFromHeight(context, factor: .2),
           padding: const EdgeInsets.all(22.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

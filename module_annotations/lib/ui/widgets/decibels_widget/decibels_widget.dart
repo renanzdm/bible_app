@@ -1,7 +1,7 @@
 import 'package:commons/commons/utils/sizes.dart';
 import 'package:commons_dependencies/main.dart';
 import 'package:flutter/material.dart';
-import 'package:module_annotations/ui/widgets/record_audio_widget/record_audio_controller.dart';
+import 'package:module_annotations/ui/widgets/record_audio_widget/bloc/record_audio_bloc.dart';
 
 class DecibelsWidget extends StatelessWidget {
   DecibelsWidget({
@@ -13,7 +13,7 @@ class DecibelsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<RecordingDisposition>(
-      stream: context.read<RecordAudioController>().onProgress,
+      stream: context.read<RecordAudioBloc>().state.onProgress,
       builder: (context, snapshot) {
         if(listDecibels.length> SizeOfWidget.sizeFromWidth(context)){
           listDecibels.removeAt(0);

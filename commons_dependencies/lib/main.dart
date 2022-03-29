@@ -12,3 +12,5 @@ export 'package:mocktail/mocktail.dart';
 export 'package:sqflite_common_ffi/sqflite_ffi.dart';
 export 'package:provider/provider.dart';
 export 'package:logger/logger.dart';
+export 'package:equatable/equatable.dart';
+export 'package:flutter_bloc/flutter_bloc.dart';
