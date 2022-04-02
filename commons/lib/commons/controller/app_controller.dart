@@ -82,6 +82,30 @@ class AppController extends ChangeNotifier implements ReassembleHandler {
         versionBible: config.versionBible);
   }
 
+   Future<void> increaseFontSize() async {
+    double sizeFont = config.fontSizeVerse.toDouble();
+    if (config.fontSizeVerse < 24) {
+      sizeFont++;
+    }
+    config = config.copyWith(fontSizeVerse: sizeFont);
+    await updateConfigTable();
+  }
+
+  Future<void> decreaseFontSize() async {
+    double sizeFont = config.fontSizeVerse.toDouble();
+    if (config.fontSizeVerse >= 12) {
+      sizeFont--;
+    }
+    config = config.copyWith(fontSizeVerse: sizeFont);
+    await updateConfigTable();
+  }
+
+    Future<void> changeTheme() async {
+    config =
+        config.copyWith(isDark: !config.isDark);
+    await updateConfigTable();
+    notifyListeners();
+  }
   @override
   void reassemble() {
     debugPrint('Did hot-reload');

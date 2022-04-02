@@ -7,5 +7,6 @@ export './commons/utils/named_routes.dart';
 export './commons/widgets/actions_app_bar_widget.dart';
 export './commons/widgets/app_bar_widget.dart';
 export './commons/widgets/dotted_line.dart';
+export './commons/utils/log_developer.dart';
 
 

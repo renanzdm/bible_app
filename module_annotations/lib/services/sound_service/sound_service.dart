@@ -11,7 +11,6 @@ abstract class SoundService{
   Future<void> resumeSound();
   bool  get isPlaying;
   Future<PlayerState> getPlayerState();
-
   Stream<PlaybackDisposition>? get onProgress;
   Future<void> openAudioSessionPlayer();
   Future<void> closeAudioSessionPlayer();

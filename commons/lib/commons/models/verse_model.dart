@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 class VerseModel {
   final int id;
   final String verse;
-   bool isMarked;
-   Color colorMarked;
+  final bool isMarked;
+  final  Color colorMarked;
 
-  VerseModel(
+  const VerseModel(
       {this.id = -1,
       this.verse = '',
       this.isMarked = false,

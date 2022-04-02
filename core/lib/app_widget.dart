@@ -5,7 +5,6 @@ import 'package:commons/commons/services/local_database_service_impl.dart';
 import 'package:commons/main.dart';
 import 'package:commons_dependencies/main.dart';
 import 'package:flutter/material.dart';
-
 import 'ui/router/route_builder.dart';
 import 'ui/theme/theme_app.dart';
 
@@ -30,13 +29,12 @@ class App extends StatelessWidget {
         builder: (context) {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
-
             title: 'Biblia App',
             theme: ThemeApp.theme(context),
             initialRoute: NamedRoutes.splashPage,
             onGenerateRoute: RouteBuilder.routes,
           );
-        }
+        },
       ),
     );
   }

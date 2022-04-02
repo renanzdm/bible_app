@@ -9,23 +9,33 @@ class ContentBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: BlockPicker(
-        pickerColor: color,
-        onColorChanged: onTap,
-        layoutBuilder: (context, colors, child) {
-          return SizedBox(
-            width: 300,
+    return BlockPicker(
+      useInShowDialog: true,
+      pickerColor: color,
+      onColorChanged: onTap,
+      layoutBuilder: (context, colors, child) {
+        return Container(
+          margin: const EdgeInsets.only(right: 16, left: 16, bottom: 22),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.all(
+              Radius.circular(32),
+            ),
+          ),
+          child: ClipRRect(
+            borderRadius: const BorderRadius.all(
+              Radius.circular(32),
+            ),
             child: GridView.count(
-              padding:EdgeInsets.zero,
+              padding: EdgeInsets.zero,
               crossAxisCount: 4,
               crossAxisSpacing: 5,
               mainAxisSpacing: 5,
               children: colors.map((color) => child(color)).toList(),
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 }

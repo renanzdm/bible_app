@@ -7,31 +7,31 @@ import 'package:commons_dependencies/main.dart';
 class ConfigVersionsBible extends StatelessWidget {
    ConfigVersionsBible({Key? key}) : super(key: key);
 
-   late AppController _appStore;
+    AppController? _appStore;
 
 
 
   @override
   Widget build(BuildContext context) {
-    _appStore = context.read<AppController>();
-    insertVersionsBible(_appStore, context);
+    _appStore ??= context.read<AppController>();
+    insertVersionsBible(_appStore!, context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Versoes'),
       ),
       body: SizedBox(
         child: ListView.builder(
-          itemCount: _appStore.versionsBible.length,
+          itemCount: _appStore!.versionsBible.length,
           itemBuilder: (BuildContext context, int index) {
-            VersionsModel version = _appStore.versionsBible[index];
+            VersionsModel version = _appStore!.versionsBible[index];
             return ListTile(
               onTap: () async {
-                await _appStore.changeVersionBible(version);
+                await _appStore!.changeVersionBible(version);
                 Navigator.pushNamedAndRemoveUntil(
-                    context, NamedRoutes.splashPage, (Route route) => false);
+                    context, NamedRoutes.splashPage, ModalRoute.withName(NamedRoutes.splashPage));
               },
               title: Text(version.description),
-              trailing: _appStore.config.versionBible == version.value
+              trailing: _appStore!.config.versionBible == version.value
                   ? const Icon(
                 Icons.person_outline_outlined,
               )
@@ -44,7 +44,7 @@ class ConfigVersionsBible extends StatelessWidget {
   }
 
   void insertVersionsBible(AppController appStore, BuildContext context) {
-    _appStore.versionsBible = [
+    _appStore!.versionsBible = [
       VersionsModel(
           name: VersionsType.ptNvi,
           value: 'pt_nvi',

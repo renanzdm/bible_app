@@ -24,6 +24,7 @@ class SoundServiceImpl implements SoundService {
   @override
   Future<void> stopSound() async{
    await _player.stopPlayer();
+   _player.stopPlayerCompleted(1, true);
   }
 
   @override
@@ -59,9 +60,6 @@ class SoundServiceImpl implements SoundService {
   Future<PlayerState> getPlayerState()async {
    return _player.getPlayerState();
   }
-
-
-
 
 
 }

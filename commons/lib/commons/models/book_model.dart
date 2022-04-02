@@ -8,7 +8,7 @@ class BookModel {
   final String abbrev;
   final String nameBook;
 
-  BookModel({
+ const BookModel({
     this.chapters = const [],
     this.abbrev = '',
     this.nameBook = '',

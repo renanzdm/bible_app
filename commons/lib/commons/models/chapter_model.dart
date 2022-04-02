@@ -4,7 +4,7 @@ class ChapterModel {
   final int id;
   final List<VerseModel> verses;
   final bool isRead;
-  ChapterModel({this.verses = const [], this.isRead = false, this.id = -1});
+  const ChapterModel({this.verses = const [], this.isRead = false, this.id = -1});
 
   factory ChapterModel.fromMap(Map<String, dynamic> map) {
     return ChapterModel(

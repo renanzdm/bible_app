@@ -7,10 +7,10 @@ import 'package:commons_dependencies/main.dart';
 import 'package:flutter/material.dart';
 import 'package:module_annotations/model/annotation_model.dart';
 import 'package:module_annotations/ui/bloc/annotations_bloc.dart';
-import 'package:module_annotations/ui/widgets/annotation_widget_sound/annotation_widget_audio.dart';
+import 'package:module_annotations/ui/widgets/annotation_widget_sound/annotation_widget.dart';
 import 'package:module_annotations/utils/utils.dart';
 import '../services/record_service/record_service_impl.dart';
-import 'widgets/annotation_widget_text/annotation_widget_text.dart';
+
 import 'widgets/record_audio_widget/bloc/record_audio_bloc.dart';
 import 'widgets/record_audio_widget/bloc/record_audio_event.dart';
 import 'widgets/record_audio_widget/record_audio_widget.dart';
@@ -35,7 +35,7 @@ class AnnotationPage extends StatelessWidget {
             create: (context) => RecordAudioBloc(
                 recordService: RecordServiceImpl(
                     myRecorder: FlutterSoundRecorder(logLevel: Level.error)))
-              ..add(LoadResourcesAudio()))
+              ..add(LoadResourcesAudio())),
       ],
       child: const AnnotationPageContent(),
     );
@@ -53,7 +53,6 @@ class _AnnotationPageContentState extends State<AnnotationPageContent> {
   late int verseId;
   late AppController _appController;
   int maxLength = 500;
-  String textValue = '';
 
   @override
   void initState() {
@@ -98,16 +97,15 @@ class _AnnotationPageContentState extends State<AnnotationPageContent> {
                               ),
                               TextField(
                                 maxLines: 5,
-                                onChanged: (value) {
-                                  setState(() {
-                                    textValue = value;
-                                  });
+                                onChanged: (String text) {
+                                  context.read<AnnotationsBloc>().add(
+                                      SetTextAnnotation(textAnnotation: text));
                                 },
                                 maxLength: maxLength,
                                 decoration: InputDecoration(
                                   border: const OutlineInputBorder(),
                                   counter: Text(
-                                      '${textValue.length}/${maxLength.toString()}'),
+                                      '${context.read<AnnotationsBloc>().state.text.length}/${maxLength.toString()}'),
                                 ),
                               ),
                               RecordAudioWidget(
@@ -124,20 +122,11 @@ class _AnnotationPageContentState extends State<AnnotationPageContent> {
                                   .watch<RecordAudioBloc>()
                                   .state
                                   .isStopped,
-                              child: Visibility(
-                                visible: annotation.audioAnnotationPath.isEmpty,
-                                child: AnnotationWidgetText(
-                                  annotationModel: annotation,
-                                  bookName: Utils.getNameBook(
-                                      idBook: annotation.bookId,
-                                      bibleModel: _appController.bibleModel),
-                                ),
-                                replacement: AnnotationWidgetAudio(
-                                  bookName: Utils.getNameBook(
-                                      idBook: annotation.bookId,
-                                      bibleModel: _appController.bibleModel),
-                                  annotationModel: annotation,
-                                ),
+                              child: AnnotationWidget(
+                                annotationModel: annotation,
+                                bookName: Utils.getNameBook(
+                                    idBook: annotation.bookId,
+                                    bibleModel: _appController.bibleModel),
                               ),
                             ),
                           )
@@ -147,11 +136,12 @@ class _AnnotationPageContentState extends State<AnnotationPageContent> {
                 ),
               ),
               Visibility(
-                visible: context
-                    .watch<RecordAudioBloc>()
-                    .state
-                    .pathAudioSaved
-                    .isNotEmpty,
+                visible: state.text.isNotEmpty ||
+                    context
+                        .watch<RecordAudioBloc>()
+                        .state
+                        .pathAudioSaved
+                        .isNotEmpty,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 20.0),
                   child: ElevatedButton(
@@ -161,17 +151,27 @@ class _AnnotationPageContentState extends State<AnnotationPageContent> {
                         40,
                       ),
                     ),
-                    onPressed: () async {
-                      context.read<AnnotationsBloc>().add(
-                            InsertAnnotations(
-                                verseId: verseId,
-                                text: textValue,
-                                audioPath: context
+                    onPressed: context.watch<RecordAudioBloc>().state.isStopped
+                        ? () async {
+                            context.read<AnnotationsBloc>().add(SetPathAudio(
+                                pathAudio: context
                                     .read<RecordAudioBloc>()
                                     .state
-                                    .pathAudioSaved),
-                          );
-                    },
+                                    .pathAudioSaved));
+                            context
+                                .read<RecordAudioBloc>()
+                                .add(ClearPathAudioAfterSaved());
+                            context
+                                .read<AnnotationsBloc>()
+                                .add(InsertAnnotations(verseId: verseId));
+                            context
+                                .read<AnnotationsBloc>()
+                                .add(const ClearAnnotation());
+                            context
+                                .read<AnnotationsBloc>()
+                                .add(GetAnnotations(id: verseId.toString()));
+                          }
+                        : null,
                     child: Text(
                       'Salvar',
                       style: Theme.of(context)

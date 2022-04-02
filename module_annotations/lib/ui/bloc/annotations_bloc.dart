@@ -4,7 +4,9 @@ import 'package:commons_dependencies/main.dart';
 import 'package:flutter/cupertino.dart';
 import '../../model/annotation_insert_model.dart';
 import '../../model/annotation_model.dart';
+
 part 'annotations_event.dart';
+
 part 'annotations_state.dart';
 
 class AnnotationsBloc extends Bloc<AnnotationsEvent, AnnotationsState> {
@@ -14,6 +16,9 @@ class AnnotationsBloc extends Bloc<AnnotationsEvent, AnnotationsState> {
     on<GetPermissions>(_getPermissions);
     on<GetAnnotations>(_getAnnotations);
     on<InsertAnnotations>(_insertAnnotation);
+    on<SetPathAudio>(_setPathAudio);
+    on<SetTextAnnotation>(_setTextAnnotation);
+    on<ClearAnnotation>(_clearAnnotations);
   }
 
   final LocalDatabaseService _localService;
@@ -22,13 +27,23 @@ class AnnotationsBloc extends Bloc<AnnotationsEvent, AnnotationsState> {
       InsertAnnotations event, Emitter<AnnotationsState> emit) async {
     emit(state.copyWith(status: AnnotationStats.loading));
     final AnnotationInsertModel annotationModel = AnnotationInsertModel(
-        annotationAudio: event.audioPath ?? '',
-        annotationText: event.text ?? '',
+        annotationAudio: state.pathAudio,
+        annotationText: state.text,
         fkVersesMarked: event.verseId);
     await _localService.insertValues(
         table: AnnotationsVersesTable.tableName,
         values: annotationModel.toMap());
     emit(state.copyWith(status: AnnotationStats.success));
+  }
+
+  Future<void> _setTextAnnotation(
+      SetTextAnnotation event, Emitter<AnnotationsState> emit) async {
+    emit(state.copyWith(text: event.textAnnotation));
+  }
+
+  Future<void> _setPathAudio(
+      SetPathAudio event, Emitter<AnnotationsState> emit) async {
+    emit(state.copyWith(pathAudio: event.pathAudio));
   }
 
   Future<void> _getAnnotations(
@@ -46,6 +61,7 @@ class AnnotationsBloc extends Bloc<AnnotationsEvent, AnnotationsState> {
     var res =
         await _localService.getValuesCustomQuery(sql: sql, args: [event.id]);
     var listAnnotations = res.map((e) => AnnotationModel.fromMap(e)).toList();
+
     emit(state.copyWith(
         listAnnotations: listAnnotations, status: AnnotationStats.success));
   }
@@ -58,5 +74,10 @@ class AnnotationsBloc extends Bloc<AnnotationsEvent, AnnotationsState> {
       emit(state.copyWith(status: AnnotationStats.failure));
     }
     emit(state.copyWith(status: AnnotationStats.success));
+  }
+
+  Future<void> _clearAnnotations(
+      ClearAnnotation event, Emitter<AnnotationsState> emit) async {
+    emit(state.copyWith(text: '',pathAudio: ''));
   }
 }

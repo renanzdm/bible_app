@@ -56,8 +56,8 @@ class HomeController extends ChangeNotifier implements ReassembleHandler {
           marked.chapterId == chapterSelected.id) {
         for (VerseModel verses in versesList) {
           if (marked.verseId == verses.id) {
-            verses.isMarked = true;
-            verses.colorMarked = marked.colorMarked;
+            verses.copyWith(isMarked: true);
+            verses.copyWith(colorMarked: marked.colorMarked);
           }
         }
       }
@@ -74,12 +74,7 @@ class HomeController extends ChangeNotifier implements ReassembleHandler {
         .copyWith(colorMarked: pickerColor, isMarked: valueForMarked);
   }
 
-  Future<void> changeTheme() async {
-    _appStore.config =
-        _appStore.config.copyWith(isDark: !_appStore.config.isDark);
-    await _appStore.updateConfigTable();
-    notifyListeners();
-  }
+
 
   Future<void> addVerseMarkedOnTable({required Color color}) async {
     if (verseIfExists.id == -1) {
@@ -94,6 +89,7 @@ class HomeController extends ChangeNotifier implements ReassembleHandler {
           table: VersesMarkedTable.tableName,
           values: verseModelSelected.toMap());
       verseIfExists = verseIfExists.copyWith(id: idItemInserted);
+
       ///Set for true for leave icons of delete verse and add annotation
       verseSelected = verseSelected.copyWith(isMarked: true);
     } else {
@@ -126,23 +122,7 @@ class HomeController extends ChangeNotifier implements ReassembleHandler {
     }
   }
 
-  Future<void> increaseFontSize() async {
-    double sizeFont = _appStore.config.fontSizeVerse.toDouble();
-    if (_appStore.config.fontSizeVerse < 24) {
-      sizeFont++;
-    }
-    _appStore.config = _appStore.config.copyWith(fontSizeVerse: sizeFont);
-    await _appStore.updateConfigTable();
-  }
-
-  Future<void> decreaseFontSize() async {
-    double sizeFont = _appStore.config.fontSizeVerse.toDouble();
-    if (_appStore.config.fontSizeVerse >= 12) {
-      sizeFont--;
-    }
-    _appStore.config = _appStore.config.copyWith(fontSizeVerse: sizeFont);
-    await _appStore.updateConfigTable();
-  }
+ 
 
   Future<void> getVersesMarkedOnTable() async {
     List response =

@@ -34,3 +34,8 @@ class DisposeResourcesAudio extends RecordAudioEvent{
   @override
   List<Object?> get props => [];
 }
+
+class ClearPathAudioAfterSaved extends RecordAudioEvent{
+  @override
+  List<Object?> get props => [];
+}

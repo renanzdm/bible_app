@@ -14,6 +14,7 @@ class RecordAudioBloc extends Bloc<RecordAudioEvent, RecordAudioState> {
     on<DisposeResourcesAudio>(_disposeResourcesAudio);
     on<PauseRecorder>(_pauseRecorder);
     on<ResumeRecorder>(_resumeRecorder);
+    on<ClearPathAudioAfterSaved>(_clearAudioPathAfterSaved);
   }
 
   final RecordService _recordService;
@@ -79,6 +80,12 @@ class RecordAudioBloc extends Bloc<RecordAudioEvent, RecordAudioState> {
     emit(state.copyWith(status: StatsStatus.loading));
     await _recordService.openAudioRecordSession();
     emit(state.copyWith(status: StatsStatus.success));
+  }
+   Future<void> _clearAudioPathAfterSaved(
+    ClearPathAudioAfterSaved event,
+    Emitter<RecordAudioState> emit,
+  ) async {
+    emit(state.copyWith(status: StatsStatus.success,pathAudioSaved: '',));
   }
 
   Future<void> _disposeResourcesAudio(

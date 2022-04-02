@@ -1,43 +1,43 @@
-import 'package:commons/commons/controller/app_controller.dart';
-import 'package:commons/commons/models/verse_model.dart';
-import 'package:flutter/material.dart';
 import 'package:commons_dependencies/main.dart';
+import 'package:flutter/material.dart';
 
-class VersesWidget extends StatelessWidget {
+import '../bloc/home_bloc.dart';
+
+class VersesWidget extends StatefulWidget {
   const VersesWidget({
     Key? key,
     required this.idVerse,
     required this.indexItem,
-    required this.verseModel,
   }) : super(key: key);
   final int idVerse;
   final int indexItem;
-  final VerseModel verseModel;
 
   @override
+  State<VersesWidget> createState() => _VersesWidgetState();
+}
+
+class _VersesWidgetState extends State<VersesWidget> {
+  @override
   Widget build(BuildContext context) {
-    return Consumer<AppController>(
-      builder: (BuildContext context, AppController value, Widget? child) {
+    return BlocBuilder<HomeBloc, HomeState>(
+      builder: (context, state) {
         return Container(
-          color: verseModel.isMarked ? verseModel.colorMarked : null,
+          color: state.versesList[widget.indexItem].isMarked ? Colors.red : null,
           padding: const EdgeInsets.all(8.0),
           child: RichText(
             text: TextSpan(
               style: Theme.of(context).textTheme.headline6?.copyWith(
-                  fontSize: value
-                      .config
-                      .fontSizeVerse
-                      .toDouble(),
+                  // fontSize: value.config.fontSizeVerse.toDouble(),
+                  fontSize: 12,
                   fontWeight: FontWeight.bold),
-              text: idVerse.toString() + ' ',
+              text: widget.idVerse.toString() + ' ',
               children: [
                 TextSpan(
-                  text: verseModel.verse,
+                  text: state.versesList[widget.indexItem].verse,
                   style: Theme.of(context).textTheme.headline5?.copyWith(
-                      fontSize: value
-                          .config
-                          .fontSizeVerse
-                          .toDouble()),
+                      // fontSize: value.config.fontSizeVerse.toDouble()
+                      fontSize: 12
+                      ),
                 ),
               ],
             ),
