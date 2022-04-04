@@ -14,6 +14,8 @@ class HomeState extends Equatable {
   final Color pickerColor;
   final Color currentColor;
   final bool scrollableListVerses;
+  final bool activeAnimation;
+  final bool listMarkedLoaded;
 
   const HomeState(
       {this.pickerColor = const Color.fromARGB(255, 124, 20, 180),
@@ -26,7 +28,9 @@ class HomeState extends Equatable {
       this.listMarkedModel = const <VersesMarkedModel>[],
       this.indexItemClicked = -1,
       this.verseIfExists = const VersesMarkedModel(),
-      this.scrollableListVerses = false
+      this.scrollableListVerses = false,
+        this.activeAnimation=false,
+        this.listMarkedLoaded=false
       });
 
   @override
@@ -41,7 +45,7 @@ class HomeState extends Equatable {
         verseIfExists,
         pickerColor,
         currentColor,
-        scrollableListVerses
+        scrollableListVerses,activeAnimation,listMarkedLoaded
       ];
 
   HomeState copyWith({
@@ -56,6 +60,8 @@ class HomeState extends Equatable {
     Color? pickerColor,
     Color? currentColor,
     bool? scrollableListVerses,
+    bool? activeAnimation,
+    bool? listMarkedLoaded,
   }) {
     return HomeState(
       status: status ?? this.status,
@@ -68,7 +74,9 @@ class HomeState extends Equatable {
       verseIfExists: verseIfExists ?? this.verseIfExists,
       pickerColor: pickerColor ?? this.pickerColor,
       currentColor: currentColor ?? this.currentColor,
-      scrollableListVerses:scrollableListVerses?? this.scrollableListVerses
+      scrollableListVerses:scrollableListVerses?? this.scrollableListVerses,
+      activeAnimation: activeAnimation??this.activeAnimation,
+      listMarkedLoaded: listMarkedLoaded ?? this.listMarkedLoaded
     );
   }
 }

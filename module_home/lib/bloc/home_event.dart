@@ -108,4 +108,14 @@ class GetIdVerseOnDatabase extends HomeEvent{
   
 }
 
+class ActiveAnimation extends HomeEvent{
+  final bool active;
+  @override
+  List<Object?> get props => [active];
+
+  const ActiveAnimation({
+    required this.active,
+  });
+}
+
 

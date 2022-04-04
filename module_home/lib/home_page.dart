@@ -5,6 +5,7 @@ import 'package:commons/main.dart';
 import 'package:flutter/material.dart';
 import 'package:module_home/bloc/home_bloc.dart';
 import 'package:module_home/widgets/content_bottom_sheet.dart';
+import 'package:module_home/widgets/header_bottom_sheet_colors.dart';
 import 'package:module_home/widgets/verse_widget.dart';
 import 'models/home_screen_arguments.dart';
 import 'widgets/content_dialog_adjust_font.dart';
@@ -46,8 +47,7 @@ class _HomePageState extends State<HomePage> {
                 verseModel: arguments!.verseModel,
                 chapterModel: arguments!.chapterModel,
                 bookModel: arguments!.bookModel))
-            ..add(const GetVersesMarkedOnTable())
-            ..add(const ConfigureVersesMarked()),
+            ..add(const GetVersesMarkedOnTable()),
         ),
       ],
       child: const HomePageContent(),
@@ -55,7 +55,6 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-// ignore: must_be_immutable
 class HomePageContent extends StatefulWidget {
   const HomePageContent({Key? key}) : super(key: key);
 
@@ -63,10 +62,13 @@ class HomePageContent extends StatefulWidget {
   State<HomePageContent> createState() => _HomePageContentState();
 }
 
-class _HomePageContentState extends State<HomePageContent> {
+class _HomePageContentState extends State<HomePageContent>
+    with SingleTickerProviderStateMixin {
   late List<PopupMenuEntry<OptionValue>> listPopButtons;
   final scrollDirection = Axis.vertical;
   late AutoScrollController controller;
+  late AnimationController _animationController;
+  late Animation<double> _animation;
 
   @override
   void initState() {
@@ -75,6 +77,16 @@ class _HomePageContentState extends State<HomePageContent> {
         viewportBoundaryGetter: () =>
             Rect.fromLTRB(0, 0, 0, MediaQuery.of(context).padding.bottom),
         axis: scrollDirection);
+    _animationController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 700));
+    _animation =
+        CurvedAnimation(parent: _animationController, curve: Curves.decelerate);
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -136,9 +148,19 @@ class _HomePageContentState extends State<HomePageContent> {
       ),
       body: BlocConsumer<HomeBloc, HomeState>(
         listener: (context, state) {
-          if ( state.scrollableListVerses) {
-            controller.scrollToIndex(state.verseSelected.id-1,
+          if (state.scrollableListVerses) {
+            controller.scrollToIndex(state.verseSelected.id - 1,
                 preferPosition: AutoScrollPosition.begin);
+          }
+          if (state.activeAnimation) {
+            _animationController
+              ..forward()
+              ..repeat(reverse: true);
+          } else {
+            _animationController.stop();
+          }
+          if (state.listMarkedLoaded) {
+            context.read<HomeBloc>().add(const ConfigureVersesMarked());
           }
         },
         builder: (BuildContext context, HomeState state) {
@@ -156,7 +178,10 @@ class _HomePageContentState extends State<HomePageContent> {
                   itemBuilder: (BuildContext parentContext, int index) {
                     return GestureDetector(
                       onTap: () async {
-                        _showBootmSheet(parentContext, index, state);
+                        _showBottomSheet(parentContext, index, state);
+                        context
+                            .read<HomeBloc>()
+                            .add(const ActiveAnimation(active: true));
                       },
                       child: AutoScrollTag(
                         controller: controller,
@@ -183,7 +208,7 @@ class _HomePageContentState extends State<HomePageContent> {
     );
   }
 
-  Future<void> _showBootmSheet(
+  Future<void> _showBottomSheet(
       BuildContext parentContext, int index, HomeState state) async {
     await showModalBottomSheet(
       context: context,
@@ -198,31 +223,25 @@ class _HomePageContentState extends State<HomePageContent> {
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Placeholder(
-                      fallbackWidth: 40,
-                      fallbackHeight: 40,
-                      color: Colors.white,
-                    ),
-                    Placeholder(
-                      fallbackWidth: 40,
-                      fallbackHeight: 40,
-                      color: Colors.white,
-                    ),
-                    Placeholder(
-                      fallbackWidth: 40,
-                      fallbackHeight: 40,
-                      color: Colors.white,
-                    ),
+                  children: [
+                    BlocProvider.value(
+                        value: parentContext.read<HomeBloc>(),
+                        child: HeaderBottomSheetColors(animation: _animation))
                   ],
                 ),
               ),
               Expanded(
                 child: ContentBottomSheet(
                     onTap: (color) {
+                      LoggerDev.ok(color);
                       parentContext
                           .read<HomeBloc>()
                           .add(SetVerseSelected(index: index));
+                      parentContext.read<HomeBloc>().add(GetIdVerseOnDatabase());
+                      parentContext
+                          .read<HomeBloc>()
+                          .add(AddVerseMarkedOnTable(color: color));
+
                     },
                     color: state.currentColor),
               ),
