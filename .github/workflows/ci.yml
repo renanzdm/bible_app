@@ -20,9 +20,9 @@ jobs:
         with:
           flutter-version: '2.10.3'
       - run: flutter pub get
+        working-directory: ./bible_app
       - run: flutter analyze
-      - run: flutter format --dry-run --set-exit-if-changed lib/
-      - run: flutter format --dry-run --set-exit-if-changed test/
+        working-directory: ./bible_app
       - run: flutter test --coverage
       - run: flutter test --machine > test-results.json
       - uses: dorny/test-reporter@v1.4.2
