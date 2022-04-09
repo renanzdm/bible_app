@@ -20,13 +20,17 @@ jobs:
         with:
           flutter-version: '2.10.3'
       - run: flutter pub get
-        working-directory: ./
+        working-directory: ./base_app
       - run: flutter analyze
-        working-directory: ./
+        working-directory: ./base_app
       - run: flutter test --coverage
       - run: flutter test --machine > test-results.json
       - uses: dorny/test-reporter@v1.4.2
         with:
+          list-suites: 'all'
+          list-tests: 'all'
+          max-annotations: '10'
+          fail-on-error: 'true'
           name: test-results
           path: test-results.json
           reporter: flutter-json
