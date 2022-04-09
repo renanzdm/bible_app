@@ -20,9 +20,9 @@ jobs:
         with:
           flutter-version: '2.10.3'
       - run: flutter pub get
-        working-directory: ./bible_app
+        working-directory: ./
       - run: flutter analyze
-        working-directory: ./bible_app
+        working-directory: ./
       - run: flutter test --coverage
       - run: flutter test --machine > test-results.json
       - uses: dorny/test-reporter@v1.4.2
