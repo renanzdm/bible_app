@@ -4,118 +4,61 @@ abstract class HomeEvent extends Equatable {
   const HomeEvent();
 }
 
-class ChangeColor extends HomeEvent {
-  final Color color;
-  const ChangeColor({
-    required this.color,
+class SetCurrentBible extends HomeEvent {
+  const SetCurrentBible({
+    required this.bookCurrent,
+    required this.chapterCurrent,
+    required this.verseCurrent,
   });
 
+  final BookModel bookCurrent;
+  final ChapterModel chapterCurrent;
+  final VersesModel verseCurrent;
+
   @override
-  List<Object?> get props => [color];
+  List<Object?> get props => [bookCurrent, chapterCurrent, verseCurrent];
 }
 
-class SetIndexVerseClicked extends HomeEvent {
-  final int index;
-  const SetIndexVerseClicked({
-    this.index = 0,
-  });
+class GetListVersesMarked extends HomeEvent {
+  const GetListVersesMarked();
 
   @override
-  List<Object?> get props => [index];
-}
-
-class SetDefaultValuesBible extends HomeEvent {
-  final VerseModel verseModel;
-  final ChapterModel chapterModel;
-  final BookModel bookModel;
-  const SetDefaultValuesBible({
-    required this.verseModel,
-    required this.chapterModel,
-    required this.bookModel,
-  });
-
-  @override
-  List<Object?> get props => [verseModel, chapterModel, bookModel];
+  List<Object?> get props => [];
 }
 
 class ConfigureVersesMarked extends HomeEvent {
-  const ConfigureVersesMarked();
-
-  @override
-  List<Object?> get props => [];
-}
-
-class SetVerseSelected extends HomeEvent {
-  final int index;
-  const SetVerseSelected({
-    this.index = 0,
-  });
-  @override
-  List<Object?> get props => [index];
-}
-
-class ChangeVerseMarkedStatus extends HomeEvent {
-  final bool valueForMarked;
-  const ChangeVerseMarkedStatus({
-    this.valueForMarked = false,
-  });
-  @override
-  List<Object?> get props => [valueForMarked];
-}
-
-class AddVerseMarkedOnTable extends HomeEvent {
-  final Color color;
-  const AddVerseMarkedOnTable({
-    required this.color,
-  });
-  @override
-  List<Object?> get props => [];
-}
-
-class UpdateColorVerseMarked extends HomeEvent {
-  final VersesMarkedModel model;
-  const UpdateColorVerseMarked({
-    required this.model,
-  });
-
-  @override
-  List<Object?> get props => [model];
-}
-
-
-class DeleteVerseMarkedOnTable extends HomeEvent {
- final VersesMarkedModel verseIfExists;
-  const DeleteVerseMarkedOnTable({
-    required this.verseIfExists,
-  });
-
-  @override
-  List<Object?> get props => [verseIfExists];
-  
-}
-
-class GetVersesMarkedOnTable extends HomeEvent{
-const GetVersesMarkedOnTable();
+ const ConfigureVersesMarked();
 
   @override
   List<Object?> get props => [];
 
 }
 
-class GetIdVerseOnDatabase extends HomeEvent{
+class MakeConfigurationVerses extends HomeEvent{
   @override
   List<Object?> get props => [];
-  
 }
 
-class ActiveAnimation extends HomeEvent{
-  final bool active;
+class ActiveAnimateListView extends HomeEvent{
+  final  bool animate;
+
+  const ActiveAnimateListView(this.animate);
+
   @override
-  List<Object?> get props => [active];
+  List<Object?> get props => [];
+}
+class ActiveAnimationController extends HomeEvent{
+  final  bool animate;
 
-  const ActiveAnimation({
-    required this.active,
-  });
+  const ActiveAnimationController(this.animate);
+
+  @override
+  List<Object?> get props => [];
 }
 
+class AddVerseOnTable extends HomeEvent{
+  const AddVerseOnTable();
+  @override
+  List<Object?> get props => [];
+}
 

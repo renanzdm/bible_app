@@ -7,10 +7,10 @@ import 'home_page.dart';
 class HomeModule implements Module {
 
 
-  @override
-  Map<String, Widget> get routes => {
-    NamedRoutes.homePage: const HomePage()
-  };
-  
+            @override
+            Map<String, Widget> get routes => {
+              NamedRoutes.homePage: const HomePage()
+            };
+            
 
-}
+          }

@@ -1,11 +1,12 @@
 import 'dart:async';
 
+import 'package:bloc/bloc.dart';
 import 'package:commons/commons/models/book_model.dart';
 import 'package:commons/commons/models/chapter_model.dart';
 import 'package:commons/commons/models/verse_model.dart';
 import 'package:commons/commons/services/local_database_service.dart';
-import 'package:commons/main.dart';
-import 'package:commons_dependencies/main.dart';
+import 'package:commons/commons/utils/tables_info.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 import '../models/verses_marked_model.dart';
@@ -16,182 +17,89 @@ part 'home_state.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc({required LocalDatabaseService localDatabaseService})
-      : _localService = localDatabaseService,
+      : _localDatabaseService = localDatabaseService,
         super(const HomeState()) {
-    on<ChangeColor>(_changeColor);
-    on<SetIndexVerseClicked>(_setIndexVerseClicked);
-    on<SetDefaultValuesBible>(_setDefaultValuesBible);
+    on<SetCurrentBible>(_setCurrentBible);
+    on<GetListVersesMarked>(_getListVersesMarked);
     on<ConfigureVersesMarked>(_configureVersesMarked);
-    on<SetVerseSelected>(_setVerseSelected);
-    on<ChangeVerseMarkedStatus>(_changeVerseMarkedStatus);
-    on<AddVerseMarkedOnTable>(_addVerseMarkedOnTable);
-    on<UpdateColorVerseMarked>(_updateColorVerseMarked);
-    on<DeleteVerseMarkedOnTable>(_deleteVerseMarkedOnTable);
-    on<GetVersesMarkedOnTable>(_getVersesMarkedOnTable);
-    on<GetIdVerseOnDatabase>(_getIdMarkedVerse);
-    on<ActiveAnimation>(_activeAnimation);
+    on<ActiveAnimateListView>(_activeAnimateListView);
+    on<ActiveAnimationController>(_activeAnimationController);
+    on<AddVerseOnTable>(_addVerseOnTable);
   }
 
-  final LocalDatabaseService _localService;
+  final LocalDatabaseService _localDatabaseService;
 
-  Future<void> _changeColor(ChangeColor event, Emitter<HomeState> emit) async {
-    emit(state.copyWith(status: HomeStats.success, pickerColor: event.color));
-  }
-
-  Future<void> _setIndexVerseClicked(
-      SetIndexVerseClicked event, Emitter<HomeState> emit) async {
-    emit(state.copyWith(status: HomeStats.loading));
+  Future<void> _setCurrentBible(
+      SetCurrentBible event, Emitter<HomeState> emit) async {
+    emit(state.copyWith(stats: HomeStats.loading));
     emit(state.copyWith(
-        status: HomeStats.success, indexItemClicked: event.index));
+        stats: HomeStats.success,
+        bookCurrent: event.bookCurrent,
+        chapterCurrent: event.chapterCurrent,
+        verseCurrent: event.verseCurrent,
+        versesList: event.chapterCurrent.verses));
   }
 
-  Future<void> _setDefaultValuesBible(
-      SetDefaultValuesBible event, Emitter<HomeState> emit) async {
-    emit(state.copyWith(status: HomeStats.loading));
+  Future<void> _getListVersesMarked(
+      GetListVersesMarked event, Emitter<HomeState> emit) async {
+    emit(state.copyWith(stats: HomeStats.loading));
+    var response = await _localDatabaseService.getValues(
+        table: VersesMarkedTable.tableName);
+    List<VersesMarkedModel> verses =
+        response.map((e) => VersesMarkedModel.fromMap(e)).toList();
     emit(state.copyWith(
-        status: HomeStats.success,
-        bookSelected: event.bookModel,
-        chapterSelected: event.chapterModel,
-        verseSelected: event.verseModel,
-        versesList: event.chapterModel.verses,
-        scrollableListVerses: true));
+        stats: HomeStats.success,
+        versesMarked: verses,
+        makeConfigurationVerses: true));
   }
 
   Future<void> _configureVersesMarked(
       ConfigureVersesMarked event, Emitter<HomeState> emit) async {
-    emit(state.copyWith(status: HomeStats.loading, listMarkedLoaded: false));
-    List<VerseModel> versesListAux = [];
-    if (state.listMarkedModel.isNotEmpty) {
-      for (VersesMarkedModel marked in state.listMarkedModel) {
-        for (VerseModel verses in state.versesList) {
-          if (marked.bookId == state.bookSelected.id &&
-              marked.chapterId == state.chapterSelected.id &&
-              marked.verseId == verses.id) {
-            versesListAux.add(verses.copyWith(
-                isMarked: true, colorMarked: marked.colorMarked));
+    emit(state.copyWith(
+        stats: HomeStats.loading, makeConfigurationVerses: false));
+    for (var marked in state.versesMarked) {
+      if (marked.chapterId == state.chapterCurrent.id &&
+          marked.bookId == state.bookCurrent.id) {
+        for (var verse in state.versesList) {
+          if (verse.id == marked.verseId) {
+            int index = state.versesList.indexOf(verse);
+            state.versesList.removeAt(index);
+            state.versesList.insert(
+                index,
+                VersesModel(
+                    id: verse.id,
+                    colorMarked: marked.colorMarked,
+                    isMarked: true,
+                    verse: verse.verse));
           }
-          versesListAux.add(verses);
         }
       }
-      emit(
-          state.copyWith(status: HomeStats.success, versesList: versesListAux));
-    } else {
-      emit(state.copyWith(
-          status: HomeStats.success, versesList: state.versesList));
     }
+
+    emit(
+        state.copyWith(stats: HomeStats.success, versesList: state.versesList));
   }
 
-  Future<void> _setVerseSelected(
-      SetVerseSelected event, Emitter<HomeState> emit) async {
-    emit(state.copyWith(status: HomeStats.loading));
-    state.versesList[event.index] =
-        state.versesList[event.index].copyWith(isMarked: true);
+  Future<void> _activeAnimateListView(
+      ActiveAnimateListView event, Emitter<HomeState> emit) async {
+    emit(state.copyWith(stats: HomeStats.success, animateList: event.animate));
+  }
+
+  Future<void> _activeAnimationController(
+      ActiveAnimationController event, Emitter<HomeState> emit) async {
     emit(state.copyWith(
-        status: HomeStats.success,
-        versesList: state.versesList,
-        verseSelected: state.versesList[event.index]));
+        stats: HomeStats.success, activeAnimationController: event.animate));
   }
 
-  Future<void> _changeVerseMarkedStatus(
-      ChangeVerseMarkedStatus event, Emitter<HomeState> emit) async {
-    emit(state.copyWith(status: HomeStats.loading));
-    var listAux = state.versesList;
-    listAux[state.indexItemClicked].copyWith(
-        colorMarked: state.pickerColor, isMarked: event.valueForMarked);
-    emit(state.copyWith(status: HomeStats.success, versesList: listAux));
-  }
-
-  Future<void> _addVerseMarkedOnTable(
-      AddVerseMarkedOnTable event, Emitter<HomeState> emit) async {
-    emit(state.copyWith(status: HomeStats.loading));
-    if (state.verseIfExists.id == -1) {
-      await _localService.insertValuesCustomQuery(sql: '''
-    INSERT INTO ${VersesMarkedTable.tableName} (
-    ${VersesMarkedTable.bookId},
-    ${VersesMarkedTable.chapterId},
-    ${VersesMarkedTable.verseId},
-    ${VersesMarkedTable.colorMarked})
-    VALUES (?,?,?,?)
-      ''', args: [
-        state.bookSelected.id.toString(),
-        state.chapterSelected.id.toString(),
-        state.verseSelected.id.toString(),
-        state.pickerColor.value.toString(),
-      ]);
-    } else {
-      add( UpdateColorVerseMarked(
-          model: VersesMarkedModel(
-        bookId: state.bookSelected.id,
-        chapterId: state.chapterSelected.id,
-        verseId: state.verseSelected.id,
-        colorMarked: state.pickerColor,
-      )));
-    }
-    emit(state.copyWith(status: HomeStats.success));
-  }
-
-  Future<void> _updateColorVerseMarked(
-      UpdateColorVerseMarked event, Emitter<HomeState> emit) async {
-    emit(state.copyWith(status: HomeStats.loading));
-    await _localService.updateValue(
-        table: VersesMarkedTable.tableName,
-        values: event.model.toMap(),
-        whereSentence: 'id = ?',
-        whereArgs: [event.model.id.toString()]);
-    emit(state.copyWith(status: HomeStats.success));
-  }
-
-  Future<void> _deleteVerseMarkedOnTable(
-      DeleteVerseMarkedOnTable event, Emitter<HomeState> emit) async {
-    emit(state.copyWith(status: HomeStats.loading));
-    if (event.verseIfExists.id != -1) {
-      await _localService.delete(
-          table: VersesMarkedTable.tableName,
-          whereSentence: '${VersesMarkedTable.id} = ? ',
-          whereArgs: [state.verseIfExists.id.toString()]);
-    }
-    emit(state.copyWith(status: HomeStats.success));
-  }
-
-  Future<void> _getVersesMarkedOnTable(
-      GetVersesMarkedOnTable event, Emitter<HomeState> emit) async {
-    emit(state.copyWith(status: HomeStats.loading));
-    List response =
-        await _localService.getValues(table: VersesMarkedTable.tableName);
-    var listMarkedModel =
-        response.map((e) => VersesMarkedModel.fromMap(e)).toList();
-    emit(state.copyWith(
-        status: HomeStats.success,
-        listMarkedModel: listMarkedModel,
-        listMarkedLoaded: true));
-  }
-
-  Future<void> _getIdMarkedVerse(
-      GetIdVerseOnDatabase event, Emitter<HomeState> emit) async {
-    emit(state.copyWith(status: HomeStats.loading));
-    List<Map<String, Object?>> values = await _localService.getValues(
-        table: VersesMarkedTable.tableName,
-        whereSentence:
-            '${VersesMarkedTable.bookId} = ?  AND ${VersesMarkedTable.chapterId} = ? AND ${VersesMarkedTable.verseId} = ? ',
-        whereArgs: [
-          state.bookSelected.id.toString(),
-          state.chapterSelected.id.toString(),
-          state.verseSelected.id.toString()
-        ]);
-    if (values.isNotEmpty) {
-      VersesMarkedModel versesMarkedModel =
-          VersesMarkedModel.fromMap(values.first);
-      emit(state.copyWith(
-          status: HomeStats.success, verseIfExists: versesMarkedModel));
-    } else {
-      emit(state.copyWith(
-          status: HomeStats.success,
-          verseIfExists: const VersesMarkedModel(id: -1)));
-    }
-  }
-
-  Future<void> _activeAnimation(
-      ActiveAnimation event, Emitter<HomeState> emit) async {
-    emit(state.copyWith(activeAnimation: event.active));
+  Future<void> _addVerseOnTable(
+      AddVerseOnTable event, Emitter<HomeState> emit) async {
+    VersesMarkedModel model = VersesMarkedModel(
+        bookId: state.bookCurrent.id,
+        chapterId: state.chapterCurrent.id,
+        verseId: 4,
+        colorMarked: Colors.blue);
+    await _localDatabaseService.insertValues(
+        table: VersesMarkedTable.tableName, values: model.toMap());
+    emit(state.copyWith(stats: HomeStats.success));
   }
 }

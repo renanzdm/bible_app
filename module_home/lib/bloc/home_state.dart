@@ -3,80 +3,63 @@ part of 'home_bloc.dart';
 enum HomeStats { init, loading, failure, success }
 
 class HomeState extends Equatable {
-  final HomeStats status;
-  final BookModel bookSelected;
-  final ChapterModel chapterSelected;
-  final VerseModel verseSelected;
-  final List<VerseModel> versesList;
-  final List<VersesMarkedModel> listMarkedModel;
-  final int indexItemClicked;
-  final VersesMarkedModel verseIfExists;
-  final Color pickerColor;
-  final Color currentColor;
-  final bool scrollableListVerses;
-  final bool activeAnimation;
-  final bool listMarkedLoaded;
+  final BookModel bookCurrent;
+  final ChapterModel chapterCurrent;
+  final VersesModel verseCurrent;
+  final HomeStats stats;
+  final List<VersesModel> versesList;
+  final List<VersesMarkedModel> versesMarked;
+  final bool makeConfigurationVerses;
+  final bool animateList;
+  final bool activeAnimationController;
 
   const HomeState(
-      {this.pickerColor = const Color.fromARGB(255, 124, 20, 180),
-      this.currentColor = const Color.fromARGB(255, 154, 14, 224),
-      this.status = HomeStats.init,
-      this.bookSelected = const BookModel(),
-      this.chapterSelected = const ChapterModel(),
-      this.verseSelected = const VerseModel(),
-      this.versesList = const <VerseModel>[],
-      this.listMarkedModel = const <VersesMarkedModel>[],
-      this.indexItemClicked = -1,
-      this.verseIfExists = const VersesMarkedModel(),
-      this.scrollableListVerses = false,
-        this.activeAnimation=false,
-        this.listMarkedLoaded=false
-      });
+      {this.bookCurrent = const BookModel(),
+      this.chapterCurrent = const ChapterModel(),
+      this.verseCurrent = const VersesModel(),
+      this.stats = HomeStats.init,
+      this.versesList = const [],
+      this.versesMarked = const [],
+      this.makeConfigurationVerses = false,
+      this.activeAnimationController = false,
+      this.animateList = false});
 
   @override
   List<Object?> get props => [
-        status,
-        bookSelected,
-        chapterSelected,
-        verseSelected,
+        bookCurrent,
+        chapterCurrent,
+        verseCurrent,
+        stats,
         versesList,
-        listMarkedModel,
-        indexItemClicked,
-        verseIfExists,
-        pickerColor,
-        currentColor,
-        scrollableListVerses,activeAnimation,listMarkedLoaded
+        versesMarked,
+        makeConfigurationVerses,
+        animateList,
+       activeAnimationController
       ];
 
   HomeState copyWith({
-    HomeStats? status,
-    BookModel? bookSelected,
-    ChapterModel? chapterSelected,
-    VerseModel? verseSelected,
-    List<VerseModel>? versesList,
-    List<VersesMarkedModel>? listMarkedModel,
-    int? indexItemClicked,
-    VersesMarkedModel? verseIfExists,
-    Color? pickerColor,
-    Color? currentColor,
-    bool? scrollableListVerses,
-    bool? activeAnimation,
-    bool? listMarkedLoaded,
+    BookModel? bookCurrent,
+    ChapterModel? chapterCurrent,
+    VersesModel? verseCurrent,
+    HomeStats? stats,
+    List<VersesModel>? versesList,
+    List<VersesMarkedModel>? versesMarked,
+    bool? makeConfigurationVerses,
+    bool? animateList,
+    bool? activeAnimationController,
   }) {
     return HomeState(
-      status: status ?? this.status,
-      bookSelected: bookSelected ?? this.bookSelected,
-      chapterSelected: chapterSelected ?? this.chapterSelected,
-      verseSelected: verseSelected ?? this.verseSelected,
+      bookCurrent: bookCurrent ?? this.bookCurrent,
+      chapterCurrent: chapterCurrent ?? this.chapterCurrent,
+      verseCurrent: verseCurrent ?? this.verseCurrent,
+      stats: stats ?? this.stats,
       versesList: versesList ?? this.versesList,
-      listMarkedModel: listMarkedModel ?? this.listMarkedModel,
-      indexItemClicked: indexItemClicked ?? this.indexItemClicked,
-      verseIfExists: verseIfExists ?? this.verseIfExists,
-      pickerColor: pickerColor ?? this.pickerColor,
-      currentColor: currentColor ?? this.currentColor,
-      scrollableListVerses:scrollableListVerses?? this.scrollableListVerses,
-      activeAnimation: activeAnimation??this.activeAnimation,
-      listMarkedLoaded: listMarkedLoaded ?? this.listMarkedLoaded
+      versesMarked: versesMarked ?? this.versesMarked,
+      makeConfigurationVerses:
+          makeConfigurationVerses ?? this.makeConfigurationVerses,
+      animateList: animateList ?? this.animateList,
+      activeAnimationController:
+          activeAnimationController ?? this.activeAnimationController,
     );
   }
 }

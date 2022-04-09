@@ -19,8 +19,8 @@
         <entry key="archive">
           <value>
             <list>
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/archive-3.3.0/lib" />
               <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/archive-3.2.1/lib" />
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/archive-3.3.0/lib" />
             </list>
           </value>
         </entry>
@@ -611,8 +611,8 @@
         <entry key="pub_semver">
           <value>
             <list>
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/pub_semver-2.1.0/lib" />
               <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/pub_semver-2.1.1/lib" />
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/pub_semver-2.1.0/lib" />
             </list>
           </value>
         </entry>

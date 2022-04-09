@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 
-class VerseModel {
+class VersesModel {
   final int id;
   final String verse;
   final bool isMarked;
   final  Color colorMarked;
 
-  const VerseModel(
+  const VersesModel(
       {this.id = -1,
       this.verse = '',
       this.isMarked = false,
       this.colorMarked = const Color(0xFFFFFFFF)});
 
-  factory VerseModel.fromMap(Map<String, dynamic> map) {
-    return VerseModel(
+  factory VersesModel.fromMap(Map<String, dynamic> map) {
+    return VersesModel(
       verse: map['text'],
       id: map['id_verse'],
       isMarked: map['is_marked'] == 0 ? false : true,
@@ -21,13 +21,13 @@ class VerseModel {
     );
   }
 
-  VerseModel copyWith({
+  VersesModel copyWith({
     int? id,
     String? verse,
     bool? isMarked,
     Color? colorMarked,
   }) {
-    return VerseModel(
+    return VersesModel(
       id: id ?? this.id,
       verse: verse ?? this.verse,
       isMarked: isMarked ?? this.isMarked,

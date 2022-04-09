@@ -2,21 +2,21 @@ import 'verse_model.dart';
 
 class ChapterModel {
   final int id;
-  final List<VerseModel> verses;
+  final List<VersesModel> verses;
   final bool isRead;
   const ChapterModel({this.verses = const [], this.isRead = false, this.id = -1});
 
   factory ChapterModel.fromMap(Map<String, dynamic> map) {
     return ChapterModel(
         verses: map['chapter_verses']
-            .map<VerseModel>((e) => VerseModel.fromMap(e))
+            .map<VersesModel>((e) => VersesModel.fromMap(e))
             .toList(),
         isRead: map['is_read'] == 0 ? false : true,
         id: map['id_chapter'] ?? '');
   }
 
   ChapterModel copyWith({
-    List<VerseModel>? verses,
+    List<VersesModel>? verses,
     bool? isRead,
   }) {
     return ChapterModel(

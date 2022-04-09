@@ -6,7 +6,7 @@ import 'package:commons/commons/models/book_model.dart';
 class HomeScreenArguments {
   BookModel bookModel;
   ChapterModel chapterModel;
-  VerseModel verseModel;
+  VersesModel verseModel;
  
   HomeScreenArguments({
     required this.bookModel,
