@@ -43,11 +43,11 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           )
-            ..add(SetDefaultValuesBible(
-                verseModel: arguments!.verseModel,
-                chapterModel: arguments!.chapterModel,
-                bookModel: arguments!.bookModel))
-            ..add(const GetVersesMarkedOnTable()),
+            ..add(SetCurrentBible(
+                verseCurrent: arguments!.verseModel,
+                chapterCurrent: arguments!.chapterModel,
+                bookCurrent: arguments!.bookModel))
+            ..add(const GetListVersesMarked()),
         ),
       ],
       child: const HomePageContent(),
@@ -97,7 +97,7 @@ class _HomePageContentState extends State<HomePageContent>
         actions: [
           ActionsAppBarWidget(
             width: 100,
-            text: context.read<HomeBloc>().state.bookSelected.nameBook,
+            text: context.read<HomeBloc>().state.bookCurrent.nameBook,
             onTap: () {
               int tabBook = 0;
               Navigator.pop(context, tabBook);
@@ -105,7 +105,7 @@ class _HomePageContentState extends State<HomePageContent>
           ),
           ActionsAppBarWidget(
             width: 60,
-            text: context.read<HomeBloc>().state.chapterSelected.id.toString(),
+            text: context.read<HomeBloc>().state.chapterCurrent.id.toString(),
             onTap: () {
               int tabChapters = 1;
               Navigator.pop(context, tabChapters);
@@ -148,25 +148,27 @@ class _HomePageContentState extends State<HomePageContent>
       ),
       body: BlocConsumer<HomeBloc, HomeState>(
         listener: (context, state) {
-          if (state.scrollableListVerses) {
-            controller.scrollToIndex(state.verseSelected.id - 1,
+          if (state.animateList) {
+            controller.scrollToIndex(state.verseCurrent.id - 1,
                 preferPosition: AutoScrollPosition.begin);
+            context.read<HomeBloc>().add(const ActiveAnimateListView(false));
           }
-          if (state.activeAnimation) {
+          if (state.activeAnimationController) {
             _animationController
               ..forward()
               ..repeat(reverse: true);
-          } else {
+          }else{
             _animationController.stop();
           }
-          if (state.listMarkedLoaded) {
+          if (state.makeConfigurationVerses) {
             context.read<HomeBloc>().add(const ConfigureVersesMarked());
+            context.read<HomeBloc>().add(const ActiveAnimateListView(true));
           }
         },
         builder: (BuildContext context, HomeState state) {
-          if (state.status == HomeStats.loading) {
-            return const Center();
-          } else if (state.status == HomeStats.success) {
+          if (state.stats == HomeStats.loading) {
+            return const Center(child: CircularProgressIndicator.adaptive(),);
+          } else if (state.stats == HomeStats.success) {
             return Padding(
               padding: ScaffoldPadding.horizontal,
               child: SizedBox(
@@ -179,9 +181,9 @@ class _HomePageContentState extends State<HomePageContent>
                     return GestureDetector(
                       onTap: () async {
                         _showBottomSheet(parentContext, index, state);
-                        context
+                        parentContext
                             .read<HomeBloc>()
-                            .add(const ActiveAnimation(active: true));
+                            .add(const ActiveAnimationController(true));
                       },
                       child: AutoScrollTag(
                         controller: controller,
@@ -233,17 +235,11 @@ class _HomePageContentState extends State<HomePageContent>
               Expanded(
                 child: ContentBottomSheet(
                     onTap: (color) {
-                      LoggerDev.ok(color);
                       parentContext
                           .read<HomeBloc>()
-                          .add(SetVerseSelected(index: index));
-                      parentContext.read<HomeBloc>().add(GetIdVerseOnDatabase());
-                      parentContext
-                          .read<HomeBloc>()
-                          .add(AddVerseMarkedOnTable(color: color));
-
+                          .add(const AddVerseOnTable());
                     },
-                    color: state.currentColor),
+                    color: Colors.red),
               ),
             ],
           ),

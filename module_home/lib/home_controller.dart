@@ -21,8 +21,8 @@ class HomeController extends ChangeNotifier implements ReassembleHandler {
   final LocalDatabaseService _localService;
   BookModel bookSelected = BookModel();
   ChapterModel chapterSelected = ChapterModel();
-  VerseModel verseSelected = VerseModel();
-  List<VerseModel> versesList = [];
+  VersesModel verseSelected = VersesModel();
+  List<VersesModel> versesList = [];
   List<VersesMarkedModel> listMarkedModel = <VersesMarkedModel>[];
 
   int indexItemClicked = -1;
@@ -40,7 +40,7 @@ class HomeController extends ChangeNotifier implements ReassembleHandler {
   }
 
   void setDefaultValuesBible({
-    required VerseModel verseModel,
+    required VersesModel verseModel,
     required ChapterModel chapterModel,
     required BookModel bookModel,
   }) {
@@ -54,7 +54,7 @@ class HomeController extends ChangeNotifier implements ReassembleHandler {
     for (VersesMarkedModel marked in versesMarked) {
       if (marked.bookId == bookSelected.id &&
           marked.chapterId == chapterSelected.id) {
-        for (VerseModel verses in versesList) {
+        for (VersesModel verses in versesList) {
           if (marked.verseId == verses.id) {
             verses.copyWith(isMarked: true);
             verses.copyWith(colorMarked: marked.colorMarked);

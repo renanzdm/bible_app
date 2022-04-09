@@ -18,7 +18,9 @@ class HeaderBottomSheetColors extends StatelessWidget {
           children: [
             AnimatedIcon(
               onTap: () {
-                context.read<HomeBloc>().add(const ActiveAnimation(active: false));
+                context
+                    .read<HomeBloc>()
+                    .add( const ActiveAnimationController(false));
                 Navigator.of(context).pop();
               },
               color: Colors.white,

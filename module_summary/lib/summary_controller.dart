@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 class SummaryController extends ChangeNotifier implements ReassembleHandler {
   BookModel bookSelected = BookModel();
   ChapterModel chapterSelected = ChapterModel();
-  VerseModel verseSelected = VerseModel();
+  VersesModel verseSelected = VersesModel();
   String versionBibleSelected = '';
 
   void setBookSelected(BookModel value) {
@@ -21,7 +21,7 @@ class SummaryController extends ChangeNotifier implements ReassembleHandler {
     notifyListeners();
   }
 
-  void setVerseSelected(VerseModel value) {
+  void setVerseSelected(VersesModel value) {
     verseSelected = value;
     notifyListeners();
   }
@@ -39,7 +39,7 @@ class SummaryController extends ChangeNotifier implements ReassembleHandler {
         id: 1);
     chapterSelected = ChapterModel(
         verses: bibleModel.books.first.chapters.first.verses, id: 1);
-    verseSelected = VerseModel(
+    verseSelected = VersesModel(
         verse: bibleModel.books.first.chapters.first.verses.first.verse, id: 1);
     versionBibleSelected = bibleModel.version;
   }
